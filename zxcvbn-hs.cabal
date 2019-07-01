@@ -33,6 +33,8 @@ common dependencies
                , cereal-text                 >= 0.1   && < 0.2
                , containers                  >= 0.6   && < 0.7
                , text                        >= 1.2   && < 1.3
+               , vector                      >= 0.12  && < 0.13
+               , lens                        >= 4.17  && < 4.18
 
 library
   import: options, dependencies
@@ -42,4 +44,7 @@ library
     Text.Password.Strength
 
   other-modules:
+    Text.Password.Strength.Dictionary
     Text.Password.Strength.Internal.Frequency
+    Text.Password.Strength.Match
+    Text.Password.Strength.SubStr
