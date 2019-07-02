@@ -64,7 +64,7 @@ matches password userDict =
     rdict = map (fmap (over substr Text.reverse)) (dict $ Text.reverse password)
 
     mkUserDict :: Dictionary
-    mkUserDict = Vector.ifoldr (\i x d -> Map.insert x i d) Map.empty userDict
+    mkUserDict = Vector.ifoldr (\i x d -> Map.insert x (i+1) d) Map.empty userDict
 
 --------------------------------------------------------------------------------
 -- | Substitute l33t characters then run a normal dictionary match.
