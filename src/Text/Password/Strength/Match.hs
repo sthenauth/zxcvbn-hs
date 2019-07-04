@@ -16,13 +16,13 @@ License: MIT
 -}
 module Text.Password.Strength.Match
   ( Match(..)
-  , MatchType(..)
   , matches
   , l33t
   ) where
 
 --------------------------------------------------------------------------------
-import Control.Lens (over)
+-- Library Imports:
+import Control.Lens ((&), (^.), (%~), (.~))
 import Control.Monad (join)
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
@@ -32,94 +32,60 @@ import qualified Data.Vector as Vector
 
 --------------------------------------------------------------------------------
 -- Project Imports:
-import Text.Password.Strength.SubStr
 import Text.Password.Strength.Dictionary
-import qualified Text.Password.Strength.Internal.Frequency as Freq
+import Text.Password.Strength.L33t
+import Text.Password.Strength.Token
 
 --------------------------------------------------------------------------------
--- | What type of match was made?
-data MatchType = DictionaryMatch
-               | ReverseDictionaryMatch
-               | L33tMatch
-               deriving (Show, Eq)
+data Match
+  = DictionaryMatch (Rank Token)
+    -- ^ 'Token' was found in a frequency dictionary with the
+    -- specified rank.
 
---------------------------------------------------------------------------------
--- | Information about a group of matches.
-data Match a = Match MatchType [a]
+  | ReverseDictionaryMatch (Rank Token)
+    -- ^ 'Token' was found in a frequency dictionary, but only after
+    -- the entire password was reversed before splitting into tokens.
+    -- The token will be in the original order with the original
+    -- coordinates.
+
+  | L33tMatch L33tSubbed L33tUnsubbed (Rank Token)
+    -- ^ 'Token' was found in a frequency dictionary, but only after
+    -- the entire password was translated from l33t speak to English.
+    --
+    -- The meaning of 'L33tSubbed' and 'L33tUnsubbed' can be found in
+    -- their respective type definitions.
+
+  | BruteForceMatch
+    -- ^ Used by the scoring system to denote a path that does not
+    -- include any of the above matches.
+
   deriving Show
 
 --------------------------------------------------------------------------------
 -- | All possible matches after various transformations.
-matches :: Text -> Vector Text -> [Match (Rank SubStr)]
-matches password userDict =
-  [ Match DictionaryMatch (dict password)
-  , Match ReverseDictionaryMatch rdict
-  , Match L33tMatch (l33t password mkUserDict)
-  ]
-  where
-    dict :: Text -> [Rank SubStr]
-    dict t = dictionary Text.toLower t mkUserDict
-
-    rdict :: [Rank SubStr]
-    rdict = map (fmap (over substr Text.reverse)) (dict $ Text.reverse password)
-
-    mkUserDict :: Dictionary
-    mkUserDict = Vector.ifoldr (\i x d -> Map.insert x (i+1) d) Map.empty userDict
-
---------------------------------------------------------------------------------
--- | Substitute l33t characters then run a normal dictionary match.
-l33t :: Text -> Dictionary -> [Rank SubStr]
-l33t password userDict =
-    concatMap (\p -> dictionary Text.toLower p userDict) split
-  where
-    split :: [Text]
-    split = case subSplit dict password of
-              [x] | x == password -> []
-                  | otherwise     -> [x]
-              xs                  -> xs
-
-    dict :: Char -> [Char]
-    dict c =
-      case c of
-        '!' -> ['i']
-        '$' -> ['s']
-        '%' -> ['x']
-        '(' -> ['c']
-        '+' -> ['t']
-        '0' -> ['o']
-        '1' -> ['i', 'l']
-        '2' -> ['z']
-        '3' -> ['e']
-        '4' -> ['a']
-        '5' -> ['s']
-        '6' -> ['g']
-        '7' -> ['l', 't']
-        '8' -> ['b']
-        '9' -> ['g']
-        '<' -> ['c']
-        '@' -> ['a']
-        '[' -> ['c']
-        '{' -> ['c']
-        '|' -> ['i', 'l']
-        _   -> []
-
---------------------------------------------------------------------------------
--- | Look up all sub-strings in all frequency dictionaries after
--- transforming each sub-string with the given function.
-dictionary :: (Text -> Text) -> Text -> Dictionary -> [Rank SubStr]
-dictionary f password userDict =
-  join [ go Freq.english_wikipedia
-       , go Freq.female_names
-       , go Freq.male_names
-       , go Freq.passwords
-       , go Freq.surnames
-       , go Freq.us_tv_and_film
-       , go userDict
+matches :: Text -> Vector Text -> [Match]
+matches password userVec =
+  join [ DictionaryMatch <$> dict password
+       , ReverseDictionaryMatch <$> rdict
+       , l33tMatch password
        ]
-
   where
-    go :: Dictionary -> [Rank SubStr]
-    go d = rank (f . _substr) d subs
+    dict :: Text -> [Rank Token]
+    dict = rankFromAll _token userDict . allTokens
 
-    subs :: [SubStr]
-    subs = allSubstrings password
+    rdict :: [Rank Token]
+    rdict = map (fmap unReverse) (dict $ Text.reverse password)
+
+    -- Fix a token that was generated from @rdict@.
+    unReverse :: Token -> Token
+    unReverse t = let lastI = Text.length password - 1
+                  in t & token      %~ Text.reverse
+                       & startIndex .~ (lastI - (t ^. endIndex))
+                       & endIndex   .~ (lastI - (t ^. startIndex))
+
+    l33tMatch :: Text -> [Match]
+    l33tMatch = map (\(x,y,z) -> L33tMatch x y z) . l33t userDict
+
+    -- Generate a user dictionary from a 'Vector'.
+    userDict :: Dictionary
+    userDict = Vector.ifoldr (\i x d -> Map.insert x (i+1) d) Map.empty userVec

@@ -46,5 +46,6 @@ library
   other-modules:
     Text.Password.Strength.Dictionary
     Text.Password.Strength.Internal.Frequency
+    Text.Password.Strength.L33t
     Text.Password.Strength.Match
-    Text.Password.Strength.SubStr
+    Text.Password.Strength.Token
