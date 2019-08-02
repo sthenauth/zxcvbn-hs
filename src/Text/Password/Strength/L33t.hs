@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections   #-}
 
@@ -49,7 +50,8 @@ data L33t = L33t
     -- ^ Number of substituted l33t characters.
 
   , _l33tUnsub :: Int
-    -- ^ Number of characters in the token that were not substituted.
+    -- ^ Number of characters in the token that were not substituted
+    -- but could have been.
 
   } deriving Show
 
@@ -58,8 +60,11 @@ makeLenses ''L33t
 --------------------------------------------------------------------------------
 -- | Translate a token from l33t, counting l33t characters.
 l33t :: Token -> [L33t]
-l33t = filter ((> 0) . _l33tSub) . map count . trans
+l33t = filter hasSubs . map count . trans
   where
+    hasSubs :: L33t -> Bool
+    hasSubs L33t{..} = _l33tSub > 0 || _l33tUnsub > 0
+
     chars :: Token -> Text
     chars = (^. tokenChars)
 

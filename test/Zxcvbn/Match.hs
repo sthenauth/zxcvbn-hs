@@ -39,6 +39,7 @@ import Text.Password.Strength
 test :: TestTree
 test = testGroup "Match"
   [ dictTest
+  , reverseTest
   , l33tTest
   ]
 
@@ -57,17 +58,31 @@ dictTest = testCase (Text.unpack password) $ do
     password = "password123"
 
 --------------------------------------------------------------------------------
+reverseTest :: TestTree
+reverseTest = testCase (Text.unpack password) $ do
+  let m = matches password userDict
+      r2 = filter (\(Rank n _) -> n == 2) (rankSort m)
+
+  not (null m)  @? "Non-empty list of matches"
+  not (null r2) @? "Should have a rank 2 match"
+  "drowssap" @=? (head r2 ^. _Rank._2.tokenChars)
+
+  where
+    password :: Text
+    password = "1drowssap_@"
+
+--------------------------------------------------------------------------------
 l33tTest :: TestTree
 l33tTest = testCase (Text.unpack password) $ do
   let m = matches password userDict
       r = rankSort m
 
   not (null r)  @? "Non-empty list of ranked matches"
-  password @=? (head r ^. _Rank._2.tokenChars)
+  "p@ssw0rd" @=? (head r ^. _Rank._2.tokenChars)
 
   where
     password :: Text
-    password = "p@ssw0rd"
+    password = "/p@ssw0rd^5"
 
 --------------------------------------------------------------------------------
 userDict :: Vector Text
