@@ -14,15 +14,16 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength
-  ( module Text.Password.Strength.Match
-  , module Text.Password.Strength.Token
-  , module Text.Password.Strength.Dictionary
-  , module Text.Password.Strength.L33t
-  ) where
+module Main (main) where
 
+--------------------------------------------------------------------------------
+import Test.Tasty
 
-import Text.Password.Strength.Match
-import Text.Password.Strength.Token
-import Text.Password.Strength.Dictionary
-import Text.Password.Strength.L33t
+--------------------------------------------------------------------------------
+import qualified Zxcvbn.Match
+
+--------------------------------------------------------------------------------
+main :: IO ()
+main = defaultMain $ testGroup "zxcbn"
+  [ Zxcvbn.Match.test
+  ]

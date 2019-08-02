@@ -1,4 +1,5 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TupleSections   #-}
 
 {-|
 
@@ -17,51 +18,62 @@ License: MIT
 
 -}
 module Text.Password.Strength.L33t
-  ( L33tSubbed
-  , L33tUnsubbed
+  ( L33t
   , l33t
+  , l33tToken
+  , l33tText
+  , l33tSub
+  , l33tUnsub
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
+import Control.Lens ((^.))
+import Control.Lens.TH (makeLenses)
 import Data.Text (Text)
 import qualified Data.Text as Text
 
 --------------------------------------------------------------------------------
 -- Project Imports:
-import Text.Password.Strength.Dictionary
 import Text.Password.Strength.Token
 
 --------------------------------------------------------------------------------
--- | Number of l33t characters that were translated to English letters.
-type L33tSubbed = Int
+data L33t = L33t
+  { _l33tToken :: Token
+    -- ^ A token containing l33t characters.
+
+  , _l33tText :: Text
+    -- ^ The translated (un-l33ted) text.
+
+  , _l33tSub :: Int
+    -- ^ Number of substituted l33t characters.
+
+  , _l33tUnsub :: Int
+    -- ^ Number of characters in the token that were not substituted.
+
+  } deriving Show
+
+makeLenses ''L33t
 
 --------------------------------------------------------------------------------
--- | Number of English characters that could have been in l33t but were not.
-type L33tUnsubbed = Int
-
---------------------------------------------------------------------------------
--- | A password token and the l33t translated version.
-type L33t = (Token, Text)
-
---------------------------------------------------------------------------------
--- | Substitute l33t characters then run a normal dictionary match.
-l33t :: Dictionary -> Text -> [(L33tSubbed, L33tUnsubbed, Rank Token)]
-l33t userDict = map (count . fmap fst) . rankFromAll snd userDict . fork
+-- | Translate a token from l33t, counting l33t characters.
+l33t :: Token -> [L33t]
+l33t = filter ((> 0) . _l33tSub) . map count . trans
   where
-    fork :: Text -> [L33t]
-    fork = concatMap trans . allTokens
+    chars :: Token -> Text
+    chars = (^. tokenChars)
 
     trans :: Token -> [(Token, Text)]
-    trans t = case translateMap l33t2Eng (_token t) of
-                [x] | x == _token t -> []
-                    | otherwise     -> [(t, x)]
-                xs                  -> map (t,) xs
+    trans t = case translateMap l33t2Eng (chars t) of
+                [x] | x == (chars t) -> []
+                    | otherwise      -> [(t, x)]
+                xs                   -> map (t,) xs
 
-    count :: Rank Token -> (L33tSubbed, L33tUnsubbed, Rank Token)
-    count r@(Rank _ t) =
-      let cnt (x, y, z) c = (x + l33tCount c, y + engCount c, z)
-      in Text.foldl cnt (0, 0, r) (_token t)
+    count :: (Token, Text) -> L33t
+    count (tk, text) =
+      let cnt (x, y) c = (x + l33tCount c, y + engCount c)
+          (s, u) = Text.foldl cnt (0, 0) (tk ^. tokenChars)
+      in L33t tk text s u
 
 --------------------------------------------------------------------------------
 -- | Convert l33t characters to their English character mappings.

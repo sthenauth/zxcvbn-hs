@@ -1,3 +1,5 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 {-|
 
 Copyright:
@@ -17,14 +19,16 @@ License: MIT
 module Text.Password.Strength.Match
   ( Match(..)
   , matches
-  , l33t
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
-import Control.Lens ((&), (^.), (%~), (.~))
+import Control.Lens ((^.), (^?), _Left, _Right, _2, views)
+import Control.Lens.TH (makePrisms)
 import Control.Monad (join)
+import Data.List (intersect)
 import qualified Data.Map.Strict as Map
+import Data.Maybe (mapMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Vector (Vector)
@@ -48,43 +52,51 @@ data Match
     -- The token will be in the original order with the original
     -- coordinates.
 
-  | L33tMatch L33tSubbed L33tUnsubbed (Rank Token)
+  | L33tMatch (Rank L33t)
     -- ^ 'Token' was found in a frequency dictionary, but only after
     -- the entire password was translated from l33t speak to English.
     --
     -- The meaning of 'L33tSubbed' and 'L33tUnsubbed' can be found in
     -- their respective type definitions.
 
-  | BruteForceMatch
+  | BruteForceMatch Token
     -- ^ Used by the scoring system to denote a path that does not
     -- include any of the above matches.
 
   deriving Show
 
+makePrisms ''Match
+
 --------------------------------------------------------------------------------
 -- | All possible matches after various transformations.
 matches :: Text -> Vector Text -> [Match]
 matches password userVec =
-  join [ DictionaryMatch <$> dict password
+  join [ DictionaryMatch <$> lookR dict
        , ReverseDictionaryMatch <$> rdict
-       , l33tMatch password
+       , L33tMatch <$> l33ts
+       , BruteForceMatch <$> brutes
        ]
   where
-    dict :: Text -> [Rank Token]
-    dict = rankFromAll _token userDict . allTokens
+    lookR :: [Lookup a] -> [Rank a]
+    lookR = mapMaybe (^? _Right)
+
+    dict :: [Lookup Token]
+    dict = rankFromAll (^. tokenChars) userDict (allTokens password)
+
+    nonDict :: [Token]
+    nonDict = mapMaybe (^? _Left) dict
 
     rdict :: [Rank Token]
-    rdict = map (fmap unReverse) (dict $ Text.reverse password)
+    rdict = lookR $ rankFromAll (views tokenChars Text.reverse) userDict nonDict
 
-    -- Fix a token that was generated from @rdict@.
-    unReverse :: Token -> Token
-    unReverse t = let lastI = Text.length password - 1
-                  in t & token      %~ Text.reverse
-                       & startIndex .~ (lastI - (t ^. endIndex))
-                       & endIndex   .~ (lastI - (t ^. startIndex))
+    l33ts :: [Rank L33t]
+    l33ts = lookR $ rankFromAll (^. l33tText) userDict (concatMap l33t nonDict)
 
-    l33tMatch :: Text -> [Match]
-    l33tMatch = map (\(x,y,z) -> L33tMatch x y z) . l33t userDict
+    -- Brute force matches are tokens that were not matched some other way.
+    brutes :: [Token]
+    brutes = nonDict
+               `intersect` map (^. _Rank._2) rdict
+               `intersect` map (^. _Rank._2.l33tToken) l33ts
 
     -- Generate a user dictionary from a 'Vector'.
     userDict :: Dictionary

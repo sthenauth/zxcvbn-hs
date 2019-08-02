@@ -19,11 +19,11 @@ License: MIT
 
 module Text.Password.Strength.Token (
     -- * Splitting a Password into Tokens
-    Token(..),
+    Token,
     allTokens,
 
     -- * Lenses for the 'Token' Type
-    token,
+    tokenChars,
     startIndex,
     endIndex,
 
@@ -38,15 +38,15 @@ import qualified Data.Text as Text
 
 --------------------------------------------------------------------------------
 data Token = Token
-  { _token      :: Text
+  { _tokenChars :: Text
   , _startIndex :: Int
   , _endIndex   :: Int
-  } deriving Show
+  } deriving (Show, Eq, Ord)
 
 makeLenses ''Token
 
 --------------------------------------------------------------------------------
--- | Extract all substrings (with @length >= 3@) from the input 'Text'.
+-- | Extract all substrings from the input 'Text'.
 --
 -- Examples:
 --
@@ -58,7 +58,7 @@ allTokens = outer 0
     outer :: Int -> Text -> [Token]
     outer i t
       | Text.null t = [ ]
-      | otherwise   = inner i 2 t ++ outer (i+1) (Text.drop 1 t)
+      | otherwise   = inner i 1 t ++ outer (i+1) (Text.drop 1 t)
 
     inner :: Int -> Int -> Text -> [Token]
     inner i j t

@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFunctor   #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 {-|
 
@@ -18,17 +19,19 @@ License: MIT
 -}
 module Text.Password.Strength.Dictionary
   ( Dictionary
+  , Lookup
   , Rank(..)
+  , _Rank
   , rank
   , rankFromAll
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
+import Control.Lens.TH (makePrisms)
 import Control.Monad (join)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import Data.Maybe (mapMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 
@@ -41,19 +44,31 @@ import qualified Text.Password.Strength.Internal.Frequency as Freq
 type Dictionary = Map Text Int
 
 --------------------------------------------------------------------------------
+type Lookup a = Either a (Rank a)
+
+--------------------------------------------------------------------------------
 -- | A ranking for type @a@ based on a frequency database.
 data Rank a = Rank Int a deriving (Show, Functor)
+
+makePrisms ''Rank
+
+--------------------------------------------------------------------------------
+rankOne :: (a -> Text) -> Dictionary -> a -> Lookup a
+rankOne f d a =
+  case Rank <$> Map.lookup (Text.toLower $ f a) d <*> pure a of
+    Just r  -> Right r
+    Nothing -> Left a
 
 --------------------------------------------------------------------------------
 -- | Lookup a ranking for all @a@ values and return ranks for those
 -- that are in the given frequency database.
-rank :: (a -> Text) -> Dictionary -> [a] -> [Rank a]
-rank f d = mapMaybe (\x -> Rank <$> Map.lookup (Text.toLower $ f x) d <*> pure x)
+rank :: (a -> Text) -> Dictionary -> [a] -> [Lookup a]
+rank f d = map (rankOne f d)
 
 --------------------------------------------------------------------------------
 -- | Look up all inputs in all frequency dictionaries after
 -- transforming each input with the given function.
-rankFromAll :: (a -> Text) -> Dictionary -> [a] -> [Rank a]
+rankFromAll :: (a -> Text) -> Dictionary -> [a] -> [Lookup a]
 rankFromAll f userDict as =
   let go dict = rank f dict as
   in join [ go Freq.english_wikipedia
