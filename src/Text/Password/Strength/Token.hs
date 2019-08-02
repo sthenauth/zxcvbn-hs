@@ -19,7 +19,7 @@ License: MIT
 
 module Text.Password.Strength.Token (
     -- * Splitting a Password into Tokens
-    Token,
+    Token(..),
     allTokens,
 
     -- * Lenses for the 'Token' Type

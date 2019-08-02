@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DeriveFunctor   #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 {-|
 
@@ -18,14 +19,16 @@ License: MIT
 -}
 module Text.Password.Strength.Estimate
   ( Guesses(..)
+  , _Guesses
   , estimate
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
 import Control.Lens ((^.))
-import qualified Data.Text as Text
+import Control.Lens.TH (makePrisms)
 import Data.Char (isUpper)
+import qualified Data.Text as Text
 import Numeric.SpecFunctions (choose)
 
 --------------------------------------------------------------------------------
@@ -36,11 +39,13 @@ import Text.Password.Strength.Match
 import Text.Password.Strength.Token
 
 --------------------------------------------------------------------------------
-data Guesses = Guesses Int Match
-  deriving Show
+data Guesses a = Guesses Int a
+  deriving (Show, Functor)
+
+makePrisms ''Guesses
 
 --------------------------------------------------------------------------------
-estimate :: Match -> Guesses
+estimate :: Match -> Guesses Match
 estimate match =
   case match of
     DictionaryMatch (Rank n t) ->

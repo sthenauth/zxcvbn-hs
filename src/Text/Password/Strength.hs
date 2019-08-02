@@ -19,6 +19,7 @@ module Text.Password.Strength
   , module Text.Password.Strength.Token
   , module Text.Password.Strength.Dictionary
   , module Text.Password.Strength.L33t
+  , module Text.Password.Strength.Estimate
   ) where
 
 
@@ -26,3 +27,4 @@ import Text.Password.Strength.Match
 import Text.Password.Strength.Token
 import Text.Password.Strength.Dictionary
 import Text.Password.Strength.L33t
+import Text.Password.Strength.Estimate

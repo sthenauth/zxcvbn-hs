@@ -20,10 +20,12 @@ module Main (main) where
 import Test.Tasty
 
 --------------------------------------------------------------------------------
+import qualified Zxcvbn.Estimate
 import qualified Zxcvbn.Match
 
 --------------------------------------------------------------------------------
 main :: IO ()
 main = defaultMain $ testGroup "zxcbn"
   [ Zxcvbn.Match.test
+  , Zxcvbn.Estimate.test
   ]
