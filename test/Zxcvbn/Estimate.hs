@@ -26,7 +26,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 --------------------------------------------------------------------------------
-import Text.Password.Strength
+import Text.Password.Strength.Internal
 
 --------------------------------------------------------------------------------
 test :: TestTree
