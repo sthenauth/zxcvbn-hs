@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes      #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 {-|
@@ -18,15 +19,15 @@ License: MIT
 -}
 module Text.Password.Strength.Internal.Match
   ( Match(..)
+  , matchToken
   , matches
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
-import Control.Lens ((^.), (^?), _Left, _Right, _2, views)
+import Control.Lens (Lens, (^.), (^?), _Left, _Right, _2, views)
 import Control.Lens.TH (makePrisms)
 import Control.Monad (join)
-import Data.List (intersect)
 import qualified Data.Map.Strict as Map
 import Data.Maybe (mapMaybe)
 import Data.Text (Text)
@@ -55,9 +56,6 @@ data Match
   | L33tMatch (Rank L33t)
     -- ^ 'Token' was found in a frequency dictionary, but only after
     -- the entire password was translated from l33t speak to English.
-    --
-    -- The meaning of 'L33tSubbed' and 'L33tUnsubbed' can be found in
-    -- their respective type definitions.
 
   | BruteForceMatch Token
     -- ^ Used by the scoring system to denote a path that does not
@@ -66,6 +64,15 @@ data Match
   deriving Show
 
 makePrisms ''Match
+
+--------------------------------------------------------------------------------
+matchToken :: Lens Match Match Token Token
+matchToken f = go
+  where
+    go (DictionaryMatch r) = DictionaryMatch <$> (_Rank._2) f r
+    go (ReverseDictionaryMatch r) = ReverseDictionaryMatch <$> (_Rank._2) f r
+    go (L33tMatch r) = L33tMatch <$> (_Rank._2.l33tToken) f r
+    go (BruteForceMatch t) = BruteForceMatch <$> f t
 
 --------------------------------------------------------------------------------
 -- | All possible matches after various transformations.
@@ -95,8 +102,8 @@ matches password userVec =
     -- Brute force matches are tokens that were not matched some other way.
     brutes :: [Token]
     brutes = nonDict
-               `intersect` map (^. _Rank._2) rdict
-               `intersect` map (^. _Rank._2.l33tToken) l33ts
+               -- `intersect` map (^. _Rank._2) rdict
+               -- `intersect` map (^. _Rank._2.l33tToken) l33ts
 
     -- Generate a user dictionary from a 'Vector'.
     userDict :: Dictionary
