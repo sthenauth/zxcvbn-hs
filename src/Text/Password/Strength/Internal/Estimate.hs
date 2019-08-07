@@ -39,7 +39,7 @@ import Text.Password.Strength.Internal.Match
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
-data Guesses a = Guesses Int a
+data Guesses a = Guesses Integer a
   deriving (Show, Functor)
 
 makePrisms ''Guesses
@@ -49,15 +49,15 @@ estimate :: Match -> Guesses Match
 estimate match =
   case match of
     DictionaryMatch (Rank n t) ->
-      Guesses (caps t n) match
+      Guesses (caps t (toInteger n)) match
 
     ReverseDictionaryMatch (Rank n t) ->
-      Guesses (caps t (n*2)) match
+      Guesses (caps t (toInteger n * 2)) match
 
     L33tMatch (Rank n l) ->
       let s = l ^. l33tSub
           u = l ^. l33tUnsub
-      in Guesses (n * l33tV s u) match
+      in Guesses (toInteger n * l33tV s u) match
 
     BruteForceMatch t ->
       let j = t ^. endIndex
@@ -65,7 +65,7 @@ estimate match =
       in Guesses (10 ^ (j-i+1)) match
 
   where
-    caps :: Token -> Int -> Int
+    caps :: Token -> Integer -> Integer
     caps token n =
       let text = token ^. tokenChars
           upper = Text.length (Text.filter isUpper text)
@@ -81,12 +81,12 @@ estimate match =
            | allUpper   -> n * 2
            | otherwise  -> n * variations upper lower
 
-    l33tV :: Int -> Int -> Int
+    l33tV :: Int -> Int -> Integer
     l33tV 0 _ = 2 -- No substitute characters
     l33tV _ 0 = 2 -- All characters substituted
     l33tV s u = variations s u
 
-    variations :: Int -> Int -> Int
+    variations :: Int -> Int -> Integer
     variations u l =
       let range = [1 .. min u l]
           ul    = u + l

@@ -22,6 +22,7 @@ module Text.Password.Strength.Internal.Search
   , Edge
   , edges
   , graph
+  , Score(..)
   , score
   , shortestPath
   ) where
@@ -50,27 +51,27 @@ type Node = Graph.LNode Char
 
 --------------------------------------------------------------------------------
 -- | An edge is a guessing graph.
-type Edge = Graph.LEdge Int
+type Edge = Graph.LEdge Integer
 
 --------------------------------------------------------------------------------
 -- | A password and estimated guesses represented as a graph.
 data Graph = Graph
   { exitNode   :: Int
-  , graphEdges :: Map (Int, Int) Int
-  , scoreGraph :: Gr Char Int
+  , graphEdges :: Map (Int, Int) Integer
+  , scoreGraph :: Gr Char Integer
   } deriving Show
 
 --------------------------------------------------------------------------------
 -- | Given a password and a user word list, produce graph edges that
 -- connect the characters of the password.
-edges :: Text -> Vector Text -> Map (Int, Int) Int
+edges :: Text -> Vector Text -> Map (Int, Int) Integer
 edges password = foldr (update . estimate) Map.empty . matches password
   where
-    update :: Guesses Match -> Map (Int, Int) Int -> Map (Int, Int) Int
+    update :: Guesses Match -> Map (Int, Int) Integer -> Map (Int, Int) Integer
     update guess = let (key, value) = mkEdge guess
                    in Map.insertWith min key value
 
-    mkEdge :: Guesses Match -> ((Int, Int), Int)
+    mkEdge :: Guesses Match -> ((Int, Int), Integer)
     mkEdge (Guesses weight match) =
       let token = match ^. matchToken
           node1 = token ^. startIndex
@@ -91,30 +92,35 @@ graph password dict =
     nodes :: [Node]
     nodes = zip [0..] (Text.unpack password)
 
-    edges' :: Map (Int, Int) Int
+    edges' :: Map (Int, Int) Integer
     edges' = edges password dict
 
-    flatten :: Map (Int, Int) Int -> [(Int, Int, Int)]
+    flatten :: Map (Int, Int) Integer -> [(Int, Int, Integer)]
     flatten = map (\((x, y), z) -> (x, y, z)) . Map.assocs
 
+--------------------------------------------------------------------------------
+-- | A score is an estimate of the number of guesses it would take to
+-- crack a password.
+newtype Score = Score { getScore :: Integer }
+  deriving (Show, Eq, Ord)
 
 --------------------------------------------------------------------------------
 -- | Collapse a graph down to a single score which represents the
 -- estimated number of guesses it would take to crack the password.
-score :: Graph -> Int
-score g@Graph{..} =
+score :: Graph -> Score
+score g@Graph{..} = Score $
   case shortestPath g of
     Nothing   -> worstCase
     Just path -> maybe worstCase product (scores (nodes path))
 
   where
-    worstCase :: Int
+    worstCase :: Integer
     worstCase = 10 ^ (exitNode + 1)
 
     nodes :: [Int] -> [(Int, Int)]
     nodes xs = zip xs (drop 1 xs)
 
-    scores :: [(Int, Int)] -> Maybe [Int]
+    scores :: [(Int, Int)] -> Maybe [Integer]
     scores = mapM (`Map.lookup` graphEdges)
 
 --------------------------------------------------------------------------------

@@ -15,5 +15,53 @@ License: MIT
 
 -}
 module Text.Password.Strength
-  (
+  ( score
+  , Search.Score(..)
+  , strength
+  , Strength(..)
   ) where
+
+--------------------------------------------------------------------------------
+-- Library Imports:
+import Data.Text (Text)
+import Data.Vector (Vector)
+
+--------------------------------------------------------------------------------
+-- Project Imports:
+import qualified Text.Password.Strength.Internal.Search as Search
+
+--------------------------------------------------------------------------------
+score :: Text -> Vector Text -> Search.Score
+score = (Search.score .) . Search.graph
+
+--------------------------------------------------------------------------------
+data Strength
+  = Risky
+    -- ^ Too guessable: risky password. (guesses < 10^3)
+
+  | Weak
+    -- ^ Very guessable: protection from throttled online
+    -- attacks. (guesses < 10^6)
+
+  | Moderate
+    -- ^ Somewhat guessable: protection from unthrottled online
+    -- attacks. (guesses < 10^8)
+
+  | Safe
+    -- ^ Safely unguessable: moderate protection from offline
+    -- slow-hash scenario. (guesses < 10^10)
+
+  | Strong
+    -- ^ Very unguessable: strong protection from offline slow-hash
+    -- scenario. (guesses >= 10^10)
+
+  deriving (Show, Eq, Ord, Enum)
+
+--------------------------------------------------------------------------------
+strength :: Search.Score -> Strength
+strength (Search.Score n)
+  | n < 10 ^ ( 3 :: Int) = Risky
+  | n < 10 ^ ( 6 :: Int) = Weak
+  | n < 10 ^ ( 8 :: Int) = Moderate
+  | n < 10 ^ (10 :: Int) = Safe
+  | otherwise            = Strong
