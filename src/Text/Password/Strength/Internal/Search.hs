@@ -37,10 +37,10 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Data.Vector (Vector)
 
 --------------------------------------------------------------------------------
 -- Project Imports:
+import Text.Password.Strength.Internal.Config
 import Text.Password.Strength.Internal.Estimate
 import Text.Password.Strength.Internal.Match
 import Text.Password.Strength.Internal.Token
@@ -64,8 +64,8 @@ data Graph = Graph
 --------------------------------------------------------------------------------
 -- | Given a password and a user word list, produce graph edges that
 -- connect the characters of the password.
-edges :: Text -> Vector Text -> Map (Int, Int) Integer
-edges password = foldr (update . estimate) Map.empty . matches password
+edges :: Config -> Text -> Map (Int, Int) Integer
+edges = (foldr (update . estimate) Map.empty .) . matches
   where
     update :: Guesses Match -> Map (Int, Int) Integer -> Map (Int, Int) Integer
     update guess = let (key, value) = mkEdge guess
@@ -82,8 +82,8 @@ edges password = foldr (update . estimate) Map.empty . matches password
 -- | Generate a guessing graph from the given password and user word
 -- list.  In the guessing graph the nodes are the characters in the
 -- password and the edges are the estimated guesses.
-graph :: Text -> Vector Text -> Graph
-graph password dict =
+graph :: Config -> Text -> Graph
+graph config password =
     Graph exit edges' (Graph.mkGraph nodes (flatten edges'))
   where
     exit :: Int
@@ -93,7 +93,7 @@ graph password dict =
     nodes = zip [0..] (Text.unpack password)
 
     edges' :: Map (Int, Int) Integer
-    edges' = edges password dict
+    edges' = edges config password
 
     flatten :: Map (Int, Int) Integer -> [(Int, Int, Integer)]
     flatten = map (\((x, y), z) -> (x, y, z)) . Map.assocs

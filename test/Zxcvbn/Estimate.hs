@@ -63,5 +63,5 @@ test = testGroup "Estimate"
     mkL33t :: L33t
     mkL33t = head (l33t $ Token "p@ssw0rd" 0 7)
 
-    guess :: Match -> Int
+    guess :: Match -> Integer
     guess m = estimate m ^. _Guesses._1

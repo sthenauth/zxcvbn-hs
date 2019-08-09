@@ -63,6 +63,7 @@ library
 
   other-modules:
     Text.Password.Strength.Generated.Frequency
+    Text.Password.Strength.Internal.Config
     Text.Password.Strength.Internal.Dictionary
     Text.Password.Strength.Internal.Estimate
     Text.Password.Strength.Internal.L33t

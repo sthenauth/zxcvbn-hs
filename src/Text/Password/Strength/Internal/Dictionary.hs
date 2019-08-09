@@ -28,22 +28,19 @@ module Text.Password.Strength.Internal.Dictionary
 
 --------------------------------------------------------------------------------
 -- Library Imports:
+import Control.Lens ((^.))
 import Control.Lens.TH (makePrisms)
 import Control.Monad (join)
-import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
 
 --------------------------------------------------------------------------------
 -- Project Imports:
-import qualified Text.Password.Strength.Generated.Frequency as Freq
+import Text.Password.Strength.Internal.Config
 
 --------------------------------------------------------------------------------
--- | Type alias for a frequency database.
-type Dictionary = Map Text Int
-
---------------------------------------------------------------------------------
+-- | Type to indicate whether or not a value can be ranked.
 type Lookup a = Either a (Rank a)
 
 --------------------------------------------------------------------------------
@@ -62,20 +59,16 @@ rankOne f d a =
 --------------------------------------------------------------------------------
 -- | Lookup a ranking for all @a@ values and return ranks for those
 -- that are in the given frequency database.
-rank :: (a -> Text) -> Dictionary -> [a] -> [Lookup a]
-rank f d = map (rankOne f d)
+rank :: (a -> Text) -> [a] -> Dictionary -> [Lookup a]
+rank f xs d = map (rankOne f d) xs
 
 --------------------------------------------------------------------------------
 -- | Look up all inputs in all frequency dictionaries after
 -- transforming each input with the given function.
-rankFromAll :: (a -> Text) -> Dictionary -> [a] -> [Lookup a]
-rankFromAll f userDict as =
-  let go dict = rank f dict as
-  in join [ go Freq.english_wikipedia
-          , go Freq.female_names
-          , go Freq.male_names
-          , go Freq.xato
-          , go Freq.surnames
-          , go Freq.us_tv_and_film
-          , go userDict
+rankFromAll :: Config -> (a -> Text) -> [a] -> [Lookup a]
+rankFromAll c f as =
+  let go = concatMap (rank f as)
+  in join [ go (c ^. passwordLists)
+          , go (c ^. wordFrequencyLists)
+          , go (c ^. customFrequencyLists)
           ]

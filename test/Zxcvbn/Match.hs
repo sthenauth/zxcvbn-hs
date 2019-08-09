@@ -27,8 +27,6 @@ import Data.List
 import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Data.Vector (Vector)
-import qualified Data.Vector as Vector
 import Test.Tasty
 import Test.Tasty.HUnit
 
@@ -46,7 +44,7 @@ test = testGroup "Match"
 --------------------------------------------------------------------------------
 dictTest :: TestTree
 dictTest = testCase (Text.unpack password) $ do
-  let m = matches password userDict
+  let m = matches en_US password
       r2 = filter (\(Rank n _) -> n == 2) (rankSort m)
 
   not (null m)  @? "Non-empty list of matches"
@@ -60,7 +58,7 @@ dictTest = testCase (Text.unpack password) $ do
 --------------------------------------------------------------------------------
 reverseTest :: TestTree
 reverseTest = testCase (Text.unpack password) $ do
-  let m = matches password userDict
+  let m = matches en_US password
       r2 = filter (\(Rank n _) -> n == 2) (rankSort m)
 
   not (null m)  @? "Non-empty list of matches"
@@ -74,7 +72,7 @@ reverseTest = testCase (Text.unpack password) $ do
 --------------------------------------------------------------------------------
 l33tTest :: TestTree
 l33tTest = testCase (Text.unpack password) $ do
-  let m = matches password userDict
+  let m = matches en_US password
       r = rankSort m
 
   not (null r)  @? "Non-empty list of ranked matches"
@@ -83,10 +81,6 @@ l33tTest = testCase (Text.unpack password) $ do
   where
     password :: Text
     password = "/p@ssw0rd^5"
-
---------------------------------------------------------------------------------
-userDict :: Vector Text
-userDict = Vector.singleton "foobar"
 
 --------------------------------------------------------------------------------
 matchRank :: Match -> Maybe (Int, Token)

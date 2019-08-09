@@ -22,7 +22,6 @@ module Zxcvbn.Search
 -- Library Imports:
 import Data.Maybe (isJust)
 import Data.Text (Text)
-import qualified Data.Vector as Vector
 import Hedgehog hiding (test)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
@@ -43,7 +42,7 @@ prop_has_shortest_path =
   property $ do
     password <- forAll genPassword
 
-    let g = graph password Vector.empty
+    let g = graph en_US password
         p = shortestPath g
 
     annotateShow password

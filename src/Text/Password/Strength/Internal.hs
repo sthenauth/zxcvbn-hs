@@ -21,6 +21,7 @@ module Text.Password.Strength.Internal
   , module Text.Password.Strength.Internal.L33t
   , module Text.Password.Strength.Internal.Estimate
   , module Text.Password.Strength.Internal.Search
+  , module Text.Password.Strength.Internal.Config
   ) where
 
 
@@ -30,3 +31,4 @@ import Text.Password.Strength.Internal.Dictionary
 import Text.Password.Strength.Internal.L33t
 import Text.Password.Strength.Internal.Estimate
 import Text.Password.Strength.Internal.Search
+import Text.Password.Strength.Internal.Config

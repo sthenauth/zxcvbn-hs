@@ -19,19 +19,21 @@ module Text.Password.Strength
   , Search.Score(..)
   , strength
   , Strength(..)
+  , Config
+  , en_US
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
 import Data.Text (Text)
-import Data.Vector (Vector)
 
 --------------------------------------------------------------------------------
 -- Project Imports:
+import Text.Password.Strength.Internal.Config
 import qualified Text.Password.Strength.Internal.Search as Search
 
 --------------------------------------------------------------------------------
-score :: Text -> Vector Text -> Search.Score
+score :: Config -> Text -> Search.Score
 score = (Search.score .) . Search.graph
 
 --------------------------------------------------------------------------------
