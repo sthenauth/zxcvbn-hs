@@ -13,7 +13,14 @@ category:      System
 -- description:
 
 --------------------------------------------------------------------------------
-extra-source-files:  CHANGELOG.md
+extra-source-files:
+  CHANGELOG.md
+
+flag tools
+  description: Build the data processing tools (i.e. dictionary compilers)
+  -- FIXME: Set this to False before first release
+  default: True
+  manual: True
 
 --------------------------------------------------------------------------------
 common options
@@ -39,6 +46,13 @@ common dependencies
                , vector                      >= 0.12  && < 0.13
 
 --------------------------------------------------------------------------------
+common tool-dependencies
+  build-depends: filepath                    >= 1.4   && < 1.5
+               , pipes                       >= 4.3   && < 4.4
+               , pipes-safe                  >= 2.3   && < 2.4
+               , pipes-text                  >= 0.0   && < 0.1
+
+--------------------------------------------------------------------------------
 library
   import: options, dependencies
   hs-source-dirs: src
@@ -55,6 +69,14 @@ library
     Text.Password.Strength.Internal.Match
     Text.Password.Strength.Internal.Search
     Text.Password.Strength.Internal.Token
+
+--------------------------------------------------------------------------------
+executable zxcvbn-freq
+  import: options, dependencies, tool-dependencies
+  main-is: Freq.hs
+  hs-source-dirs: tools
+  if !flag(tools)
+    buildable: False
 
 --------------------------------------------------------------------------------
 test-suite test

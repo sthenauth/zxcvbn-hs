@@ -5,7 +5,7 @@
 {-|
 
 Copyright:
-  This file is part of the package sthenauth. It is subject to the
+  This file is part of the package zxcvbn-hs. It is subject to the
   license terms in the LICENSE file found in the top-level directory
   of this distribution and at:
 
