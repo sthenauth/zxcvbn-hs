@@ -20,6 +20,7 @@ module Main (main) where
 import Test.Tasty
 
 --------------------------------------------------------------------------------
+import qualified Zxcvbn.Adjacency
 import qualified Zxcvbn.Estimate
 import qualified Zxcvbn.Match
 import qualified Zxcvbn.Search
@@ -30,4 +31,5 @@ main = defaultMain $ testGroup "zxcbn"
   [ Zxcvbn.Match.test
   , Zxcvbn.Estimate.test
   , Zxcvbn.Search.test
+  , Zxcvbn.Adjacency.test
   ]

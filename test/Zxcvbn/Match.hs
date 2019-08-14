@@ -89,6 +89,7 @@ matchRank match =
     DictionaryMatch r        -> Just (r ^. _Rank)
     ReverseDictionaryMatch r -> Just (r ^. _Rank)
     L33tMatch  r             -> Just (r ^. _Rank._1, r ^. _Rank._2.l33tToken)
+    KeyboardMatch _          -> Nothing
     BruteForceMatch _        -> Nothing
 
 --------------------------------------------------------------------------------

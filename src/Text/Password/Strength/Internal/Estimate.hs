@@ -29,13 +29,14 @@ import Control.Lens ((^.))
 import Control.Lens.TH (makePrisms)
 import Data.Char (isUpper)
 import qualified Data.Text as Text
-import Numeric.SpecFunctions (choose)
 
 --------------------------------------------------------------------------------
 -- Project Imports:
 import Text.Password.Strength.Internal.Dictionary
+import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
 import Text.Password.Strength.Internal.Match
+import Text.Password.Strength.Internal.Math
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
@@ -57,7 +58,10 @@ estimate match =
     L33tMatch (Rank n l) ->
       let s = l ^. l33tSub
           u = l ^. l33tUnsub
-      in Guesses (toInteger n * l33tV s u) match
+      in Guesses (toInteger n * variations' s u) match
+
+    KeyboardMatch k ->
+      Guesses (keyboardEstimate k) match
 
     BruteForceMatch t ->
       let j = t ^. endIndex
@@ -67,11 +71,11 @@ estimate match =
   where
     caps :: Token -> Integer -> Integer
     caps token n =
-      let text = token ^. tokenChars
-          upper = Text.length (Text.filter isUpper text)
-          lower = Text.length text - upper
-          allLower = lower == Text.length text
-          allUpper = lower == 0
+      let text       = token ^. tokenChars
+          upper      = Text.length (Text.filter isUpper text)
+          lower      = Text.length text - upper
+          allLower   = lower == Text.length text
+          allUpper   = lower == 0
           firstUpper = upper == 1 && Text.all isUpper (Text.take 1 text)
           lastUpper  = upper == 1 && Text.all isUpper (Text.takeEnd 1 text)
       in case () of
@@ -80,15 +84,3 @@ estimate match =
            | lastUpper  -> n * 2
            | allUpper   -> n * 2
            | otherwise  -> n * variations upper lower
-
-    l33tV :: Int -> Int -> Integer
-    l33tV 0 _ = 2 -- No substitute characters
-    l33tV _ 0 = 2 -- All characters substituted
-    l33tV s u = variations s u
-
-    variations :: Int -> Int -> Integer
-    variations u l =
-      let range = [1 .. min u l]
-          ul    = u + l
-          sigma = sum (map (ul `choose`) range)
-       in floor (sigma / 2)

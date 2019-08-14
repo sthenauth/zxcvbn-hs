@@ -25,9 +25,11 @@ module Text.Password.Strength.Internal.Config
   , addPasswordDict
   , addWordFrequencyDict
   , addCustomFrequencyList
+  , addKeyboardGraph
   , passwordLists
   , wordFrequencyLists
   , customFrequencyLists
+  , keyboardGraphs
   ) where
 
 --------------------------------------------------------------------------------
@@ -43,6 +45,7 @@ import qualified Data.Vector as Vector
 --------------------------------------------------------------------------------
 -- Project Imports:
 import qualified Text.Password.Strength.Generated.Frequency as Freq
+import Text.Password.Strength.Internal.Adjacency (AdjacencyTable)
 
 --------------------------------------------------------------------------------
 -- | Type alias for a frequency database.
@@ -63,6 +66,9 @@ data Config = Config
     --
     -- Usually includes information about the person whose password we
     -- are guessing and the application for which we are running.
+
+  , _keyboardGraphs :: [AdjacencyTable]
+    -- ^ Keyboard adjacency graphs.
   }
 
 makeClassy ''Config
@@ -73,10 +79,11 @@ instance Semigroup Config where
       x & passwordLists        %~ (++ (y ^. passwordLists))
         & wordFrequencyLists   %~ (++ (y ^. wordFrequencyLists))
         & customFrequencyLists %~ (++ (y ^. customFrequencyLists))
+        & keyboardGraphs       %~ (++ (y ^. keyboardGraphs))
 
 --------------------------------------------------------------------------------
 instance Monoid Config where
-  mempty = Config [] [] []
+  mempty = Config [] [] [] []
 
 --------------------------------------------------------------------------------
 -- | Default configuration for US English.
@@ -90,6 +97,8 @@ en_US = Config{..}
                             , Freq.male_names
                             , Freq.surnames
                             , Freq.us_tv_and_film
+                            ]
+    _keyboardGraphs       = [
                             ]
 
 --------------------------------------------------------------------------------
@@ -123,3 +132,11 @@ addCustomFrequencyList v = addDict (mkDict v)
 
     addDict :: Dictionary -> Config -> Config
     addDict d = customFrequencyLists %~ (d:)
+
+--------------------------------------------------------------------------------
+-- | Add a keyboard adjacency graph.
+--
+-- An adjacency graph can be created with the tools included in this
+-- package.  Please see the @tools@ directory for more details.
+addKeyboardGraph :: AdjacencyTable -> Config -> Config
+addKeyboardGraph g = keyboardGraphs %~ (g:)

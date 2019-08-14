@@ -36,6 +36,7 @@ import qualified Data.Text as Text
 -- Project Imports:
 import Text.Password.Strength.Internal.Config
 import Text.Password.Strength.Internal.Dictionary
+import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
 import Text.Password.Strength.Internal.Token
 
@@ -55,6 +56,8 @@ data Match
     -- ^ 'Token' was found in a frequency dictionary, but only after
     -- the entire password was translated from l33t speak to English.
 
+  | KeyboardMatch KeyboardPattern
+
   | BruteForceMatch Token
     -- ^ Used by the scoring system to denote a path that does not
     -- include any of the above matches.
@@ -70,6 +73,7 @@ matchToken f = go
     go (DictionaryMatch r) = DictionaryMatch <$> (_Rank._2) f r
     go (ReverseDictionaryMatch r) = ReverseDictionaryMatch <$> (_Rank._2) f r
     go (L33tMatch r) = L33tMatch <$> (_Rank._2.l33tToken) f r
+    go (KeyboardMatch p) = KeyboardMatch <$> keyboardToken f p
     go (BruteForceMatch t) = BruteForceMatch <$> f t
 
 --------------------------------------------------------------------------------
@@ -79,6 +83,7 @@ matches config password =
   join [ DictionaryMatch <$> lookR dict
        , ReverseDictionaryMatch <$> rdict
        , L33tMatch <$> l33ts
+       , KeyboardMatch <$> keyboard
        , BruteForceMatch <$> brutes
        ]
   where
@@ -96,6 +101,10 @@ matches config password =
 
     l33ts :: [Rank L33t]
     l33ts = lookR $ rankFromAll config (^. l33tText) (concatMap l33t nonDict)
+
+    keyboard :: [KeyboardPattern]
+    keyboard = concatMap (\g -> mapMaybe (keyboardPattern g) nonDict)
+                         (config ^. keyboardGraphs)
 
     -- Brute force matches are tokens that were not matched some other way.
     brutes :: [Token]
