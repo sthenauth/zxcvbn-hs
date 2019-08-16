@@ -44,6 +44,7 @@ import qualified Data.Vector as Vector
 
 --------------------------------------------------------------------------------
 -- Project Imports:
+import qualified Text.Password.Strength.Generated.Adjacency as Adjc
 import qualified Text.Password.Strength.Generated.Frequency as Freq
 import Text.Password.Strength.Internal.Adjacency (AdjacencyTable)
 
@@ -69,7 +70,8 @@ data Config = Config
 
   , _keyboardGraphs :: [AdjacencyTable]
     -- ^ Keyboard adjacency graphs.
-  }
+
+  } deriving (Show)
 
 makeClassy ''Config
 
@@ -98,7 +100,8 @@ en_US = Config{..}
                             , Freq.surnames
                             , Freq.us_tv_and_film
                             ]
-    _keyboardGraphs       = [
+    _keyboardGraphs       = [ Adjc.qwerty
+                            , Adjc.numpad
                             ]
 
 --------------------------------------------------------------------------------
