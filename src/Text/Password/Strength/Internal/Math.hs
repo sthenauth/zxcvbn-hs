@@ -37,9 +37,12 @@ variations u l = sum (floor . choose (u+l) <$> [1 .. min u l]) `div` 2
 -- | Like equation 2, but modified for l33t and keyboard variations.
 --
 -- This equation does not appear in the 2016 paper although it is
--- mentioned.  Therefore it was adapted from CoffeeScript and Python
--- implementations.
+-- mentioned.  Therefore it was adapted from the CoffeeScript and
+-- Python implementations.
 variations' :: Int -> Int -> Integer
 variations' 0 _ = 2
 variations' _ 0 = 2
 variations' u l = variations u l
+
+--------------------------------------------------------------------------------
+-- NOTE: Equation 3 is in Keybaord.hs.

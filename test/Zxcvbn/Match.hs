@@ -23,6 +23,7 @@ module Zxcvbn.Match
 
 --------------------------------------------------------------------------------
 import Control.Lens
+import Data.Function (on)
 import Data.List
 import Data.Maybe
 import Data.Text (Text)
@@ -96,4 +97,4 @@ matchRank match =
 rankSort :: [Match] -> [Rank Token]
 rankSort = map (^. re _Rank) . sortBy f . mapMaybe matchRank
   where
-    f a b = (a ^. _1) `compare` (b ^. _1)
+    f = compare `on` (^. _1)

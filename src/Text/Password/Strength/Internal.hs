@@ -23,6 +23,7 @@ module Text.Password.Strength.Internal
   , module Text.Password.Strength.Internal.Search
   , module Text.Password.Strength.Internal.Config
   , module Text.Password.Strength.Internal.Adjacency
+  , module Text.Password.Strength.Internal.Keyboard
   ) where
 
 
@@ -34,3 +35,4 @@ import Text.Password.Strength.Internal.Estimate
 import Text.Password.Strength.Internal.Search
 import Text.Password.Strength.Internal.Config
 import Text.Password.Strength.Internal.Adjacency
+import Text.Password.Strength.Internal.Keyboard

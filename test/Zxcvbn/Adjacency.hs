@@ -21,6 +21,7 @@ module Zxcvbn.Adjacency
   ) where
 
 --------------------------------------------------------------------------------
+import Control.Lens
 import Data.Foldable (foldl')
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -48,12 +49,22 @@ simpleGraph =  AdjacencyTable
                             ]
 
 --------------------------------------------------------------------------------
+scoreQwerty :: Text -> Maybe Integer
+scoreQwerty password =
+  keyboardEstimate <$> keyboardPattern (en_US ^. keyboardGraphs.to head)
+                                       (Token password 0 5)
+
+--------------------------------------------------------------------------------
 test :: TestTree
 test = testGroup "Adjacency"
   [ testCase "asE" $ adj "asE" @?= Just (AdjacencyScore 3 2 2 1 (Move NE))
   , testCase "sEw" $ adj "sEw" @?= Just (AdjacencyScore 3 2 2 1 (Move W))
   , testCase "ewa" $ adj "ewa" @?= Just (AdjacencyScore 3 2 3 0 (Move SW))
   , testCase "aSE" $ adj "aSE" @?= Nothing
+
+  -- Testing scoring:
+  , testCase "asdf"   $ scoreQwerty "asdf"   @?= Just 1128   -- Python: 1296
+  , testCase "asdftG" $ scoreQwerty "asdftG" @?= Just 205860 -- Python: 1219890
   ]
 
   where
