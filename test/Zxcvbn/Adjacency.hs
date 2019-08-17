@@ -34,7 +34,7 @@ import Text.Password.Strength.Internal
 --------------------------------------------------------------------------------
 simpleGraph :: AdjacencyTable
 simpleGraph =  AdjacencyTable
-    { _totalChars = 0
+    { _totalChars = 5
     , _averageNeighbors = 3
     , _patterns = makeDict
     }

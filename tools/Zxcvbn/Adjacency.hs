@@ -37,6 +37,7 @@ import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import System.FilePath (takeFileName, dropExtension)
+import qualified Data.Set as Set
 import System.IO
 
 --------------------------------------------------------------------------------
@@ -175,14 +176,30 @@ adjacency k (l, x, y) = fromMaybe [] $ do
     toLayer _ = Internal.Secondary
 
 --------------------------------------------------------------------------------
+-- | Convert a keyboard to an adjacency table.
 adjTable :: Keyboard -> AdjacencyTable
-adjTable k = AdjacencyTable 0 0 table
+adjTable k = AdjacencyTable chars avns table
   where
+    -- The adjacency table.
     table :: Map Pattern Adjacency
     table = Map.foldrWithKey append Map.empty (kbTable k)
 
+    -- Add entries to the table.
     append :: (Layer, Row, Column) -> Entry -> Map Pattern Adjacency -> Map Pattern Adjacency
     append key _ m = foldr (uncurry Map.insert) m (adjacency k key)
+
+    -- Total number of keys on the keyboard.
+    chars :: Int
+    chars = Set.size $ Set.fromList $ map (^. _1._1) $ Map.assocs table
+
+    -- Average number of neighbors.  In the paper, keys can only be
+    -- neighbors if they are on the same layer and not the same key.
+    -- Also, I truncate the average so we can continue to use integer
+    -- arithmetic everywhere.
+    avns :: Int
+    avns =
+      let ns = filter (\a -> _firstLayer a == _secondLayer a) (Map.elems table)
+      in (length ns - chars) `div` chars
 
 --------------------------------------------------------------------------------
 run :: Global -> IO ()
@@ -196,6 +213,8 @@ run Global{..} = do
 
     when debug $ do
       hPutStrLn stderr ("==> " <> file)
+      hPutStrLn stderr ("       Total keys: " <> show (_totalChars table))
+      hPutStrLn stderr ("Average Neighbors: " <> show (_averageNeighbors table))
       forM_ (Map.assocs (_patterns table)) $ \(key, val) ->
         hPutStrLn stderr (show key <> "\t" <> show val)
 
