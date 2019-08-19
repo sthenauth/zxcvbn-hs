@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 {-|
 
 Copyright:
@@ -14,24 +16,33 @@ Copyright:
 License: MIT
 
 -}
-module Main (main) where
+module Zxcvbn.Repeat
+  ( test
+  ) where
 
 --------------------------------------------------------------------------------
+import Control.Lens
+import Data.List (nub, sort)
+import Data.Text (Text)
+import qualified Data.Text as Text
 import Test.Tasty
+import Test.Tasty.HUnit
 
 --------------------------------------------------------------------------------
-import qualified Zxcvbn.Adjacency
-import qualified Zxcvbn.Estimate
-import qualified Zxcvbn.Match
-import qualified Zxcvbn.Search
-import qualified Zxcvbn.Repeat
+import Text.Password.Strength.Internal
 
 --------------------------------------------------------------------------------
-main :: IO ()
-main = defaultMain $ testGroup "zxcbn"
-  [ Zxcvbn.Match.test
-  , Zxcvbn.Estimate.test
-  , Zxcvbn.Search.test
-  , Zxcvbn.Adjacency.test
-  , Zxcvbn.Repeat.test
+test :: TestTree
+test = testGroup "Repeat"
+  [ tc "ss"       $ \p -> counts p @?= [2]
+  , tc "sss"      $ \p -> counts p @?= [2, 3]
+  , tc "wordword" $ \p -> counts p @?= [2]
+  , tc "abcdefg"  $ \p -> counts p @?= []
   ]
+
+  where
+    tc :: Text -> (Text -> Assertion) -> TestTree
+    tc t f = testCase (Text.unpack t) (f t)
+
+    counts :: Text -> [Int]
+    counts = nub . sort . map (^. _2) . repeatMatch . allTokens

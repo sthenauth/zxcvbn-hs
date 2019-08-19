@@ -77,6 +77,7 @@ library
     Text.Password.Strength.Internal.L33t
     Text.Password.Strength.Internal.Match
     Text.Password.Strength.Internal.Math
+    Text.Password.Strength.Internal.Repeat
     Text.Password.Strength.Internal.Search
     Text.Password.Strength.Internal.Token
 
@@ -110,4 +111,5 @@ test-suite test
     Zxcvbn.Adjacency
     Zxcvbn.Estimate
     Zxcvbn.Match
+    Zxcvbn.Repeat
     Zxcvbn.Search
