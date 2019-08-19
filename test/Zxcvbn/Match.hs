@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
 
 {-|
 
@@ -23,9 +22,7 @@ module Zxcvbn.Match
 
 --------------------------------------------------------------------------------
 import Control.Lens
-import Data.Function (on)
-import Data.List
-import Data.Maybe
+import qualified Data.Map as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Test.Tasty
@@ -37,64 +34,35 @@ import Text.Password.Strength.Internal
 --------------------------------------------------------------------------------
 test :: TestTree
 test = testGroup "Match"
-  [ dictTest
-  , reverseTest
-  , l33tTest
+  [ shouldRank "password123" "password" 2
+  , shouldRank "1drowssap_@" "drowssap" 2
+  , shouldRank "/p@ssw0rd^5" "p@ssw0rd" 2
   ]
 
 --------------------------------------------------------------------------------
-dictTest :: TestTree
-dictTest = testCase (Text.unpack password) $ do
-  let m = matches en_US password
-      r2 = filter (\(Rank n _) -> n == 2) (rankSort m)
+shouldRank :: Text -> Text -> Int -> TestTree
+shouldRank p p' n =
+  testCase (Text.unpack p) $ do
+    let ms = matches en_US p
+        ts = filter (\t -> t ^. tokenChars == p') (Map.keys ms)
 
-  not (null m)  @? "Non-empty list of matches"
-  not (null r2) @? "Should have a rank 2 match"
-  "password" @=? (head r2 ^. _Rank._2.tokenChars)
+    t <- case ts of
+           []  -> assertFailure ("missing token: " <> show p' <> " " <> show ms)
+           [x] -> pure x
+           _   -> assertFailure ("multiple matching tokens! " <> show p')
 
-  where
-    password :: Text
-    password = "password123"
-
---------------------------------------------------------------------------------
-reverseTest :: TestTree
-reverseTest = testCase (Text.unpack password) $ do
-  let m = matches en_US password
-      r2 = filter (\(Rank n _) -> n == 2) (rankSort m)
-
-  not (null m)  @? "Non-empty list of matches"
-  not (null r2) @? "Should have a rank 2 match"
-  "drowssap" @=? (head r2 ^. _Rank._2.tokenChars)
+    case Map.lookup t ms of
+      Nothing -> assertFailure "should not happen"
+      Just xs -> getRank xs @?= n
 
   where
-    password :: Text
-    password = "1drowssap_@"
+    getRank :: [Match] -> Int
+    getRank [] = -1
+    getRank xs = minimum (map extract xs)
 
---------------------------------------------------------------------------------
-l33tTest :: TestTree
-l33tTest = testCase (Text.unpack password) $ do
-  let m = matches en_US password
-      r = rankSort m
-
-  not (null r)  @? "Non-empty list of ranked matches"
-  "p@ssw0rd" @=? (head r ^. _Rank._2.tokenChars)
-
-  where
-    password :: Text
-    password = "/p@ssw0rd^5"
-
---------------------------------------------------------------------------------
-matchRank :: Match -> Maybe (Int, Token)
-matchRank match =
-  case match of
-    DictionaryMatch r        -> Just (r ^. _Rank)
-    ReverseDictionaryMatch r -> Just (r ^. _Rank)
-    L33tMatch  r             -> Just (r ^. _Rank._1, r ^. _Rank._2.l33tToken)
-    KeyboardMatch _          -> Nothing
-    BruteForceMatch _        -> Nothing
-
---------------------------------------------------------------------------------
-rankSort :: [Match] -> [Rank Token]
-rankSort = map (^. re _Rank) . sortBy f . mapMaybe matchRank
-  where
-    f = compare `on` (^. _1)
+    extract :: Match -> Int
+    extract (DictionaryMatch n') = n'
+    extract (ReverseDictionaryMatch n') = n'
+    extract (L33tMatch n' _) = n'
+    extract (KeyboardMatch _) = -1
+    extract BruteForceMatch = -1

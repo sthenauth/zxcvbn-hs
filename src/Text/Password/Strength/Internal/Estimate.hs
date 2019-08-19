@@ -1,6 +1,3 @@
-{-# LANGUAGE DeriveFunctor   #-}
-{-# LANGUAGE TemplateHaskell #-}
-
 {-|
 
 Copyright:
@@ -18,21 +15,21 @@ License: MIT
 
 -}
 module Text.Password.Strength.Internal.Estimate
-  ( Guesses(..)
-  , _Guesses
+  ( Guesses
+  , Estimates
+  , Estimate(..)
+  , estimateAll
   , estimate
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
 import Control.Lens ((^.))
-import Control.Lens.TH (makePrisms)
-import Data.Char (isUpper)
-import qualified Data.Text as Text
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 
 --------------------------------------------------------------------------------
 -- Project Imports:
-import Text.Password.Strength.Internal.Dictionary
 import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
 import Text.Password.Strength.Internal.Match
@@ -40,47 +37,45 @@ import Text.Password.Strength.Internal.Math
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
-data Guesses a = Guesses Integer a
-  deriving (Show, Functor)
-
-makePrisms ''Guesses
+type Estimates = Map Token Estimate
 
 --------------------------------------------------------------------------------
-estimate :: Match -> Guesses Match
-estimate match =
+type Guesses = Map Token Integer
+
+--------------------------------------------------------------------------------
+newtype Estimate = Estimate
+  { getEstimate :: Estimates -> Integer }
+
+--------------------------------------------------------------------------------
+estimateAll :: Matches -> Guesses
+estimateAll ms =
+    Map.map (`getEstimate` estimates) estimates
+  where
+    estimate' :: Token -> [Match] -> Estimates -> Integer
+    estimate' t ms' e = sum (map (\m -> estimate t m e) ms')
+
+    estimates :: Estimates
+    estimates = Map.mapWithKey (\t m -> Estimate (estimate' t m)) ms
+
+--------------------------------------------------------------------------------
+estimate :: Token -> Match -> Estimates -> Integer
+estimate token match _ =
   case match of
-    DictionaryMatch (Rank n t) ->
-      Guesses (caps t (toInteger n)) match
+    DictionaryMatch n ->
+      caps token (toInteger n)
 
-    ReverseDictionaryMatch (Rank n t) ->
-      Guesses (caps t (toInteger n * 2)) match
+    ReverseDictionaryMatch n ->
+      caps token (toInteger n * 2)
 
-    L33tMatch (Rank n l) ->
+    L33tMatch n l ->
       let s = l ^. l33tSub
           u = l ^. l33tUnsub
-      in Guesses (toInteger n * variations' s u) match
+      in toInteger n * variations' s u
 
     KeyboardMatch k ->
-      Guesses (keyboardEstimate k) match
+      keyboardEstimate k
 
-    BruteForceMatch t ->
-      let j = t ^. endIndex
-          i = t ^. startIndex
-      in Guesses (10 ^ (j-i+1)) match
-
-  where
-    caps :: Token -> Integer -> Integer
-    caps token n =
-      let text       = token ^. tokenChars
-          upper      = Text.length (Text.filter isUpper text)
-          lower      = Text.length text - upper
-          allLower   = lower == Text.length text
-          allUpper   = lower == 0
-          firstUpper = upper == 1 && Text.all isUpper (Text.take 1 text)
-          lastUpper  = upper == 1 && Text.all isUpper (Text.takeEnd 1 text)
-      in case () of
-        () | allLower   -> n
-           | firstUpper -> n * 2
-           | lastUpper  -> n * 2
-           | allUpper   -> n * 2
-           | otherwise  -> n * variations upper lower
+    BruteForceMatch ->
+      let j = token ^. endIndex
+          i = token ^. startIndex
+      in 10 ^ (j-i+1)

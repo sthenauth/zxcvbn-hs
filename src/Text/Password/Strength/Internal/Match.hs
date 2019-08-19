@@ -1,5 +1,6 @@
 {-# LANGUAGE RankNTypes      #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TupleSections   #-}
 
 {-|
 
@@ -19,16 +20,18 @@ License: MIT
 -}
 module Text.Password.Strength.Internal.Match
   ( Match(..)
-  , matchToken
+  , Matches
   , matches
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
-import Control.Lens (Lens, (^.), (^?), _Left, _Right, _2, views)
+import Control.Lens ((^.), _1, views, minimumByOf)
 import Control.Lens.TH (makePrisms)
-import Control.Monad (join)
-import Data.Maybe (mapMaybe)
+import Data.Function (on)
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
+import Data.Maybe (mapMaybe, catMaybes)
 import Data.Text (Text)
 import qualified Data.Text as Text
 
@@ -42,23 +45,23 @@ import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
 data Match
-  = DictionaryMatch (Rank Token)
+  = DictionaryMatch Rank
     -- ^ 'Token' was found in a frequency dictionary with the
     -- specified rank.
 
-  | ReverseDictionaryMatch (Rank Token)
+  | ReverseDictionaryMatch Rank
     -- ^ 'Token' was found in a frequency dictionary, but only after
     -- the entire password was reversed before splitting into tokens.
     -- The token will be in the original order with the original
     -- coordinates.
 
-  | L33tMatch (Rank L33t)
+  | L33tMatch Rank L33t
     -- ^ 'Token' was found in a frequency dictionary, but only after
     -- the entire password was translated from l33t speak to English.
 
   | KeyboardMatch KeyboardPattern
 
-  | BruteForceMatch Token
+  | BruteForceMatch
     -- ^ Used by the scoring system to denote a path that does not
     -- include any of the above matches.
 
@@ -67,47 +70,55 @@ data Match
 makePrisms ''Match
 
 --------------------------------------------------------------------------------
-matchToken :: Lens Match Match Token Token
-matchToken f = go
-  where
-    go (DictionaryMatch r) = DictionaryMatch <$> (_Rank._2) f r
-    go (ReverseDictionaryMatch r) = ReverseDictionaryMatch <$> (_Rank._2) f r
-    go (L33tMatch r) = L33tMatch <$> (_Rank._2.l33tToken) f r
-    go (KeyboardMatch p) = KeyboardMatch <$> keyboardToken f p
-    go (BruteForceMatch t) = BruteForceMatch <$> f t
+-- | Information about how a token matches a specific match pattern.
+type Matches = Map Token [Match]
 
 --------------------------------------------------------------------------------
 -- | All possible matches after various transformations.
-matches :: Config -> Text -> [Match]
-matches config password =
-  join [ DictionaryMatch <$> lookR dict
-       , ReverseDictionaryMatch <$> rdict
-       , L33tMatch <$> l33ts
-       , KeyboardMatch <$> keyboard
-       , BruteForceMatch <$> brutes
-       ]
+matches :: Config -> Text -> Matches
+matches config =
+    repeats .
+      foldr (\t -> Map.insert t (check t)) Map.empty .
+        allTokens
   where
-    lookR :: [Lookup a] -> [Rank a]
-    lookR = mapMaybe (^? _Right)
+    check :: Token -> [Match]
+    check t =
+      let ms = catMaybes [ dict t
+                         , rdict t
+                         , l33ts t
+                         ] ++ kbd t
+      in case ms of
+           [] -> [BruteForceMatch]
+           xs -> xs
 
-    dict :: [Lookup Token]
-    dict = rankFromAll config (^. tokenChars) (allTokens password)
+    -- Tokens that appear in a dictionary.
+    dict :: Token -> Maybe Match
+    dict t = DictionaryMatch <$> rankFromAll config (^. tokenChars) t
 
-    nonDict :: [Token]
-    nonDict = mapMaybe (^? _Left) dict
+    -- Tokens that, when reversed, appear in a dictionary.
+    rdict :: Token -> Maybe Match
+    rdict t = ReverseDictionaryMatch <$>
+                rankFromAll config (views tokenChars Text.reverse) t
 
-    rdict :: [Rank Token]
-    rdict = lookR $ rankFromAll config (views tokenChars Text.reverse) nonDict
+    -- Tokens that, when decoded, appear in a dictionary.
+    --
+    -- A token may l33t decode into several words that are then looked
+    -- up in the word dictionaries.  The word with the lowest rank is
+    -- kept and the others are discarded.
+    l33ts :: Token -> Maybe Match
+    l33ts t =
+      let ts = l33t t -- Decoding may result in multiple outputs.
+          rnk l = (,l) <$> rankFromAll config (^. l33tText) l
+      in uncurry L33tMatch <$>
+           minimumByOf traverse (compare `on` (^. _1))
+                                (mapMaybe rnk ts)
 
-    l33ts :: [Rank L33t]
-    l33ts = lookR $ rankFromAll config (^. l33tText) (concatMap l33t nonDict)
+    -- A token that is a pattern on one or more keyboards.
+    kbd :: Token -> [Match]
+    kbd t = KeyboardMatch <$>
+              mapMaybe (`keyboardPattern` t)
+                (config ^. keyboardGraphs)
 
-    keyboard :: [KeyboardPattern]
-    keyboard = concatMap (\g -> mapMaybe (keyboardPattern g) nonDict)
-                         (config ^. keyboardGraphs)
-
-    -- Brute force matches are tokens that were not matched some other way.
-    brutes :: [Token]
-    brutes = nonDict
-               -- `intersect` map (^. _Rank._2) rdict
-               -- `intersect` map (^. _Rank._2.l33tToken) l33ts
+    -- Tokens that are repeats of previous tokens.
+    repeats :: Matches -> Matches
+    repeats = id -- FIXME: implement this

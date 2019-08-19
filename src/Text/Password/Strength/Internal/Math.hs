@@ -17,11 +17,19 @@ License: MIT
 module Text.Password.Strength.Internal.Math
   ( variations
   , variations'
+  , caps
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
+import Control.Lens ((^.))
+import Data.Char (isUpper)
+import qualified Data.Text as Text
 import Numeric.SpecFunctions (choose)
+
+--------------------------------------------------------------------------------
+-- Project Imports:
+import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
 -- | Equation 2, section 4, page 163 (8/18)
@@ -43,6 +51,25 @@ variations' :: Int -> Int -> Integer
 variations' 0 _ = 2
 variations' _ 0 = 2
 variations' u l = variations u l
+
+--------------------------------------------------------------------------------
+-- | Score the use of uppercase letters according to the paper.  This
+-- is specified in the paragraph preceding equation 2.
+caps :: Token -> Integer -> Integer
+caps token n =
+  let text       = token ^. tokenChars
+      upper      = Text.length (Text.filter isUpper text)
+      lower      = Text.length text - upper
+      allLower   = lower == Text.length text
+      allUpper   = lower == 0
+      firstUpper = upper == 1 && Text.all isUpper (Text.take 1 text)
+      lastUpper  = upper == 1 && Text.all isUpper (Text.takeEnd 1 text)
+  in case () of
+    () | allLower   -> n
+       | firstUpper -> n * 2
+       | lastUpper  -> n * 2
+       | allUpper   -> n * 2
+       | otherwise  -> n * variations upper lower
 
 --------------------------------------------------------------------------------
 -- NOTE: Equation 3 is in Keybaord.hs.

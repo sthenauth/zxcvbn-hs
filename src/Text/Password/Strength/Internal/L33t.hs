@@ -21,7 +21,6 @@ License: MIT
 module Text.Password.Strength.Internal.L33t
   ( L33t
   , l33t
-  , l33tToken
   , l33tText
   , l33tSub
   , l33tUnsub
@@ -40,10 +39,7 @@ import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
 data L33t = L33t
-  { _l33tToken :: Token
-    -- ^ A token containing l33t characters.
-
-  , _l33tText :: Text
+  { _l33tText :: Text
     -- ^ The translated (un-l33ted) text.
 
   , _l33tSub :: Int
@@ -70,15 +66,15 @@ l33t = filter hasSubs . map count . trans
 
     trans :: Token -> [(Token, Text)]
     trans t = case translateMap l33t2Eng (chars t) of
-                [x] | x == (chars t) -> []
-                    | otherwise      -> [(t, x)]
-                xs                   -> map (t,) xs
+                [x] | x == chars t -> []
+                    | otherwise    -> [(t, x)]
+                xs                 -> map (t,) xs
 
     count :: (Token, Text) -> L33t
     count (tk, text) =
       let cnt (x, y) c = (x + l33tCount c, y + engCount c)
           (s, u) = Text.foldl cnt (0, 0) (tk ^. tokenChars)
-      in L33t tk text s u
+      in L33t text s u
 
 --------------------------------------------------------------------------------
 -- | Convert l33t characters to their English character mappings.

@@ -21,7 +21,7 @@ module Zxcvbn.Estimate
   ) where
 
 --------------------------------------------------------------------------------
-import Control.Lens
+import qualified Data.Map as Map
 import Test.Tasty
 import Test.Tasty.HUnit
 
@@ -32,22 +32,22 @@ import Text.Password.Strength.Internal
 test :: TestTree
 test = testGroup "Estimate"
   [ testCase "dict" $
-      guess (DictionaryMatch (Rank 2 token)) @?= 2
+      guess token (DictionaryMatch 2) @?= 2
 
   , testCase "dict w/ mixed case" $
-      guess (DictionaryMatch (Rank 2 uToken)) @?= 8
+      guess uToken (DictionaryMatch 2) @?= 8
 
   , testCase "dict w/ initial upper" $
-      guess (DictionaryMatch (Rank 2 cToken)) @?= 4
+      guess cToken (DictionaryMatch 2) @?= 4
 
   , testCase "reverse dict" $
-      guess (ReverseDictionaryMatch (Rank 2 token)) @?= 4
+      guess token (ReverseDictionaryMatch 2) @?= 4
 
   , testCase "l33t" $
-      guess (L33tMatch (Rank 2 mkL33t)) @?= 10
+      guess token (L33tMatch 2 mkL33t) @?= 10
 
   , testCase "brute force" $
-      guess (BruteForceMatch token) @?= 100000000
+      guess token BruteForceMatch @?= 100000000
   ]
 
   where
@@ -63,5 +63,5 @@ test = testGroup "Estimate"
     mkL33t :: L33t
     mkL33t = head (l33t $ Token "p@ssw0rd" 0 7)
 
-    guess :: Match -> Integer
-    guess m = estimate m ^. _Guesses._1
+    guess :: Token -> Match -> Integer
+    guess t m = estimate t m Map.empty

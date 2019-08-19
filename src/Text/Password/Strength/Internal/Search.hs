@@ -65,18 +65,11 @@ data Graph = Graph
 -- | Given a password and a user word list, produce graph edges that
 -- connect the characters of the password.
 edges :: Config -> Text -> Map (Int, Int) Integer
-edges = (foldr (update . estimate) Map.empty .) . matches
+edges c p = Map.mapKeys loc (estimateAll (matches c p))
   where
-    update :: Guesses Match -> Map (Int, Int) Integer -> Map (Int, Int) Integer
-    update guess = let (key, value) = mkEdge guess
-                   in Map.insertWith min key value
-
-    mkEdge :: Guesses Match -> ((Int, Int), Integer)
-    mkEdge (Guesses weight match) =
-      let token = match ^. matchToken
-          node1 = token ^. startIndex
-          node2 = token ^. endIndex
-      in ((node1, node2), weight)
+    -- Convert a token into a location (Node).
+    loc :: Token -> (Int, Int)
+    loc t = (t ^. startIndex, t ^. endIndex)
 
 --------------------------------------------------------------------------------
 -- | Generate a guessing graph from the given password and user word
