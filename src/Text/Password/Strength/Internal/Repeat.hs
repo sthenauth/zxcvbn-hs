@@ -1,5 +1,3 @@
-{-# LANGUAGE TupleSections #-}
-
 {-|
 
 Copyright:
@@ -17,14 +15,19 @@ License: MIT
 
 -}
 module Text.Password.Strength.Internal.Repeat
-  ( repeatMatch
+  ( RepeatMap
+  , mkRepeatMap
+  , repeatMatch
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
-import Control.Applicative ((<|>))
-import Control.Lens ((^.))
-import Data.Maybe (catMaybes)
+import Control.Arrow ((&&&))
+import Control.Lens ((^.), _1)
+import Data.Function (on)
+import Data.List (sortBy, subsequences, maximumBy)
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
 
@@ -33,35 +36,61 @@ import qualified Data.Text as Text
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
--- | Length of text if all characters are the same.
-repeatingChar :: Text -> Maybe Int
-repeatingChar t | Text.length t == 0 = Nothing
-                | otherwise          = go
-  where
-    go :: Maybe Int
-    go = if Text.all (== Text.head t) t
-           then Just (Text.length t)
-           else Nothing
+-- | Internal mapping of repeating tokens.
+newtype RepeatMap = RepeatMap
+  { getMap :: Map Text [Token] }
 
 --------------------------------------------------------------------------------
-duplicateToken :: (Foldable t) => Token -> t Token -> Maybe Int
-duplicateToken t ts = if count /= 0 then Just (count + 1) else Nothing
-  where
-    count :: Int
-    count = foldr match 0 ts
-
-    match :: Token -> Int -> Int
-    match t' n =
-      n + (if t' /= t && (t' ^. tokenChars) == (t ^. tokenChars)
-             then 1
-             else 0)
+-- | Type alias for a count of repeating tokens.
+type Repeat = Int
 
 --------------------------------------------------------------------------------
-repeatMatch :: (Foldable t) => t Token -> [(Token, Int)]
-repeatMatch ts = catMaybes (foldr match [] ts)
-  where
-    match :: Token -> [Maybe (Token, Int)] -> [Maybe (Token, Int)]
-    match t rs = ((t,) <$> check t):rs
+-- | Generate a repeat map from an existing token map.
+mkRepeatMap :: Map Token a -> RepeatMap
+mkRepeatMap = RepeatMap . Map.foldrWithKey f Map.empty
+  where f t _ = Map.insertWith (<>) (t ^. tokenChars) [t]
 
-    check :: Token -> Maybe Int
-    check t = repeatingChar (t ^. tokenChars) <|> duplicateToken t ts
+--------------------------------------------------------------------------------
+-- | Test to see if the given token is repeated.
+--
+-- If a repeat is found, the number of occurrences is returned along
+-- with the full token representing the repeating sequence.
+--
+-- In other words, if the token passed in is "word" and in the map we
+-- find that the original password contains "wordword", we return 2 to
+-- indicate 2 repeats and the token that represents the sequence
+-- "wordword".
+repeatMatch :: RepeatMap -> Token -> Maybe (Repeat, Token)
+repeatMatch m t =
+    Map.lookup (t ^. tokenChars) (getMap m) >>=
+      ordered >>=
+        longestSequence >>=
+          mkToken
+  where
+    ordered :: [Token] -> Maybe [Token]
+    ordered []  = Nothing
+    ordered [_] = Nothing -- Must have at least two elements to repeat.
+    ordered xs  = Just $ sortBy (compare `on` (^. startIndex)) xs
+
+    longestSequence :: [Token] -> Maybe (Repeat, [Token])
+    longestSequence ts =
+      let f = filter (\(n,_) -> n >= 2) .
+                map (length &&& id) .
+                  filter (all isSequence . lineUp) .
+                    subsequences
+      in case f ts of
+        [] -> Nothing
+        xs -> Just $ maximumBy (compare `on` (^. _1)) xs
+
+    mkToken :: (Repeat, [Token]) -> Maybe (Repeat, Token)
+    mkToken (_, []) = Nothing
+    mkToken (n, ts) = Just $
+      let s = head ts ^. startIndex
+          e = last ts ^. endIndex
+      in (n, Token (Text.replicate n (t ^. tokenChars)) s e)
+
+    lineUp :: [Token] -> [(Token, Token)]
+    lineUp xs = zip xs (drop 1 xs)
+
+    isSequence :: (Token, Token) -> Bool
+    isSequence (x, y) = (y ^. startIndex) - (x ^. endIndex) == 1

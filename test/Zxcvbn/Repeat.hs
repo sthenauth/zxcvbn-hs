@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections     #-}
 
 {-|
 
@@ -21,8 +22,8 @@ module Zxcvbn.Repeat
   ) where
 
 --------------------------------------------------------------------------------
-import Control.Lens
-import Data.List (nub, sort)
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Test.Tasty
@@ -34,15 +35,21 @@ import Text.Password.Strength.Internal
 --------------------------------------------------------------------------------
 test :: TestTree
 test = testGroup "Repeat"
-  [ tc "ss"       $ \p -> counts p @?= [2]
-  , tc "sss"      $ \p -> counts p @?= [2, 3]
-  , tc "wordword" $ \p -> counts p @?= [2]
-  , tc "abcdefg"  $ \p -> counts p @?= []
+  [ tc "wordword"      "word" $ Just (2, Token "wordword" 0 7)
+  , tc "wordword@word" "word" $ Just (2, Token "wordword" 0 7)
+  , tc "word@wordword" "word" $ Just (2, Token "wordword" 5 12)
+  , tc "word2word"     "word" Nothing
+  , tc "word"          "word" Nothing
+  , tc "abcdefg"       "abc"  Nothing
   ]
 
   where
-    tc :: Text -> (Text -> Assertion) -> TestTree
-    tc t f = testCase (Text.unpack t) (f t)
+    tc :: Text -> Text -> Maybe (Int, Token) -> TestTree
+    tc p t r = testCase (Text.unpack p) $
+      repeatMatch (rmap p) (Token t 0 0) @?= r
 
-    counts :: Text -> [Int]
-    counts = nub . sort . map (^. _2) . repeatMatch . allTokens
+    tmap :: Text -> Map Token ()
+    tmap = Map.fromList . map (,()) . allTokens
+
+    rmap :: Text -> RepeatMap
+    rmap = mkRepeatMap . tmap
