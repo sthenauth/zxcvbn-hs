@@ -27,6 +27,7 @@ module Text.Password.Strength.Internal.Estimate
 import Control.Lens ((^.))
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import Data.Maybe (fromMaybe)
 
 --------------------------------------------------------------------------------
 -- Project Imports:
@@ -52,14 +53,15 @@ estimateAll ms =
     Map.map (`getEstimate` estimates) estimates
   where
     estimate' :: Token -> [Match] -> Estimates -> Integer
-    estimate' t ms' e = sum (map (\m -> estimate t m e) ms')
+    estimate' t []  e = estimate t BruteForceMatch e
+    estimate' t ms' e = minimum $ map (\m -> estimate t m e) ms'
 
     estimates :: Estimates
     estimates = Map.mapWithKey (\t m -> Estimate (estimate' t m)) ms
 
 --------------------------------------------------------------------------------
 estimate :: Token -> Match -> Estimates -> Integer
-estimate token match _ =
+estimate token match es =
   case match of
     DictionaryMatch n ->
       caps token (toInteger n)
@@ -74,6 +76,11 @@ estimate token match _ =
 
     KeyboardMatch k ->
       keyboardEstimate k
+
+    RepeatMatch n t ->
+      let invalid = estimate t BruteForceMatch es
+          guess = (`getEstimate` es) <$> Map.lookup t es
+      in fromMaybe invalid guess * toInteger n
 
     BruteForceMatch ->
       let j = token ^. endIndex

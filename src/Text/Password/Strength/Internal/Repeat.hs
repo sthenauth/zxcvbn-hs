@@ -16,6 +16,7 @@ License: MIT
 -}
 module Text.Password.Strength.Internal.Repeat
   ( RepeatMap
+  , Repeat
   , mkRepeatMap
   , repeatMatch
   ) where

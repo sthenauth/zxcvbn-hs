@@ -65,4 +65,5 @@ shouldRank p p' n =
     extract (ReverseDictionaryMatch n') = n'
     extract (L33tMatch n' _) = n'
     extract (KeyboardMatch _) = -1
+    extract (RepeatMatch _ _) = -1
     extract BruteForceMatch = -1

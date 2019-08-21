@@ -41,29 +41,36 @@ import Text.Password.Strength.Internal.Config
 import Text.Password.Strength.Internal.Dictionary
 import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
+import Text.Password.Strength.Internal.Repeat
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
 data Match
   = DictionaryMatch Rank
-    -- ^ 'Token' was found in a frequency dictionary with the
-    -- specified rank.
+    -- ^ The associated token was found in a frequency dictionary with
+    -- the specified rank.
 
   | ReverseDictionaryMatch Rank
-    -- ^ 'Token' was found in a frequency dictionary, but only after
-    -- the entire password was reversed before splitting into tokens.
-    -- The token will be in the original order with the original
-    -- coordinates.
+    -- ^ The associated token was found in a frequency dictionary, but
+    -- only after its characters were reversed.
 
   | L33tMatch Rank L33t
-    -- ^ 'Token' was found in a frequency dictionary, but only after
-    -- the entire password was translated from l33t speak to English.
+    -- ^ The associated token was found in a frequency dictionary, but
+    -- only after its characters were translated from l33t speak to
+    -- English.
 
   | KeyboardMatch KeyboardPattern
+    -- ^ The associated token is wholly made up of an adjacent
+    -- sequence of characters that make a pattern on a keyboard.
+
+  | RepeatMatch Repeat Token
+    -- ^ The associated token is an adjacent repeat of another token
+    -- (the one given to this constructor).  The number of times it
+    -- repeats is given as 'Repeat'.
 
   | BruteForceMatch
-    -- ^ Used by the scoring system to denote a path that does not
-    -- include any of the above matches.
+    -- ^ The associated token does not match any other algorithm from
+    -- above.
 
   deriving Show
 
@@ -119,6 +126,10 @@ matches config =
               mapMaybe (`keyboardPattern` t)
                 (config ^. keyboardGraphs)
 
-    -- Tokens that are repeats of previous tokens.
+    -- Tokens that are repeats of some other token.
     repeats :: Matches -> Matches
-    repeats = id -- FIXME: implement this
+    repeats ms =
+      let rmap = mkRepeatMap ms
+          f t = (\(n, t') -> (t', [RepeatMatch n t])) <$> repeatMatch rmap t
+          g t m = maybe m (\(k,v) -> Map.insertWith (<>) k v m) (f t)
+      in Map.foldrWithKey (const . g) ms ms
