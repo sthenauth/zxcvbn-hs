@@ -42,6 +42,7 @@ import Text.Password.Strength.Internal.Dictionary
 import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
 import Text.Password.Strength.Internal.Repeat
+import Text.Password.Strength.Internal.Sequence
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
@@ -68,6 +69,15 @@ data Match
     -- (the one given to this constructor).  The number of times it
     -- repeats is given as 'Repeat'.
 
+  | SequenceMatch Delta
+    -- ^ The characters of the associated token form a sequence
+    -- because the delta between all the characters is the same.
+    --
+    -- Examples:
+    --
+    --   * abc
+    ---  * 135
+
   | BruteForceMatch
     -- ^ The associated token does not match any other algorithm from
     -- above.
@@ -93,6 +103,7 @@ matches config =
       let ms = catMaybes [ dict t
                          , rdict t
                          , l33ts t
+                         , seqMatch t
                          ] ++ kbd t
       in case ms of
            [] -> [BruteForceMatch]
@@ -133,3 +144,7 @@ matches config =
           f t = (\(n, t') -> (t', [RepeatMatch n t])) <$> repeatMatch rmap t
           g t m = maybe m (\(k,v) -> Map.insertWith (<>) k v m) (f t)
       in Map.foldrWithKey (const . g) ms ms
+
+    -- Characters in a token form a sequence.
+    seqMatch :: Token -> Maybe Match
+    seqMatch t = SequenceMatch <$> isSequence (t ^. tokenChars)

@@ -64,4 +64,4 @@ test = testGroup "Estimate"
     mkL33t = head (l33t $ Token "p@ssw0rd" 0 7)
 
     guess :: Token -> Match -> Integer
-    guess t m = estimate t m Map.empty
+    guess t m = estimate en_US t m Map.empty

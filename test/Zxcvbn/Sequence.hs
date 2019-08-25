@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 {-|
 
 Copyright:
@@ -14,26 +16,30 @@ Copyright:
 License: MIT
 
 -}
-module Main (main) where
+module Zxcvbn.Sequence
+  ( test
+  ) where
 
 --------------------------------------------------------------------------------
+import Data.Text (Text)
+import qualified Data.Text as Text
 import Test.Tasty
+import Test.Tasty.HUnit
 
 --------------------------------------------------------------------------------
-import qualified Zxcvbn.Adjacency
-import qualified Zxcvbn.Estimate
-import qualified Zxcvbn.Match
-import qualified Zxcvbn.Search
-import qualified Zxcvbn.Repeat
-import qualified Zxcvbn.Sequence
+import Text.Password.Strength.Internal
 
 --------------------------------------------------------------------------------
-main :: IO ()
-main = defaultMain $ testGroup "zxcbn"
-  [ Zxcvbn.Match.test
-  , Zxcvbn.Estimate.test
-  , Zxcvbn.Search.test
-  , Zxcvbn.Adjacency.test
-  , Zxcvbn.Repeat.test
-  , Zxcvbn.Sequence.test
+test :: TestTree
+test = testGroup "Sequence"
+  [ tc "abcdef" (@?= Just 1)
+  , tc "123456" (@?= Just 1)
+  , tc "9753"   (@?= Just (-2))
+  , tc "acbrf"  (@?= Nothing)
+  , tc "aaaaaa" (@?= Just 0)
+  , tc "λνορσυ" (@?= Just 2)
   ]
+
+  where
+    tc :: Text -> (Maybe Delta -> Assertion) -> TestTree
+    tc label f = testCase (Text.unpack label) (f $ isSequence label)

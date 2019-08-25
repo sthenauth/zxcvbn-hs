@@ -30,11 +30,12 @@ module Text.Password.Strength.Internal.Config
   , wordFrequencyLists
   , customFrequencyLists
   , keyboardGraphs
+  , obviousSequenceStart
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
-import Control.Lens ((&), (^.), (%~))
+import Control.Lens ((&), (^.), (.~), (%~))
 import Control.Lens.TH (makeClassy)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -71,7 +72,12 @@ data Config = Config
   , _keyboardGraphs :: [AdjacencyTable]
     -- ^ Keyboard adjacency graphs.
 
-  } deriving (Show)
+  , _obviousSequenceStart :: Char -> Bool
+    -- ^ Predicate function that should return 'True' for characters
+    -- that are "obvious first choices" to start a sequence.  For
+    -- example, in English, @a@ and @A@ would be considered 'True'.
+
+  }
 
 makeClassy ''Config
 
@@ -82,10 +88,11 @@ instance Semigroup Config where
         & wordFrequencyLists   %~ (++ (y ^. wordFrequencyLists))
         & customFrequencyLists %~ (++ (y ^. customFrequencyLists))
         & keyboardGraphs       %~ (++ (y ^. keyboardGraphs))
+        & obviousSequenceStart .~     (y ^. obviousSequenceStart)
 
 --------------------------------------------------------------------------------
 instance Monoid Config where
-  mempty = Config [] [] [] []
+  mempty = Config [] [] [] [] (const False)
 
 --------------------------------------------------------------------------------
 -- | Default configuration for US English.
@@ -103,6 +110,10 @@ en_US = Config{..}
     _keyboardGraphs       = [ Adjc.qwerty
                             , Adjc.numpad
                             ]
+    _obviousSequenceStart c =
+      c == 'a' || c == 'A' ||
+      c == 'z' || c == 'Z' ||
+      c == '0' || c == '1' || c == '9'
 
 --------------------------------------------------------------------------------
 -- | Add a password frequency dictionary.

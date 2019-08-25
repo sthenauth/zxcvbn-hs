@@ -65,7 +65,7 @@ data Graph = Graph
 -- | Given a password and a user word list, produce graph edges that
 -- connect the characters of the password.
 edges :: Config -> Text -> Map (Int, Int) Integer
-edges c p = Map.mapKeys loc (estimateAll (matches c p))
+edges c p = Map.mapKeys loc (estimateAll c (matches c p))
   where
     -- Convert a token into a location (Node).
     loc :: Token -> (Int, Int)

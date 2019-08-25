@@ -79,6 +79,7 @@ library
     Text.Password.Strength.Internal.Math
     Text.Password.Strength.Internal.Repeat
     Text.Password.Strength.Internal.Search
+    Text.Password.Strength.Internal.Sequence
     Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
@@ -113,3 +114,4 @@ test-suite test
     Zxcvbn.Match
     Zxcvbn.Repeat
     Zxcvbn.Search
+    Zxcvbn.Sequence
