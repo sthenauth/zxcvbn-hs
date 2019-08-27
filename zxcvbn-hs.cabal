@@ -36,6 +36,7 @@ common options
 --------------------------------------------------------------------------------
 common dependencies
   build-depends: base                        >= 4.9   && < 5.0
+               , attoparsec                  >= 0.13  && < 0.14
                , base64-bytestring           >= 1.0   && < 1.1
                , cereal                      >= 0.5   && < 0.6
                , cereal-text                 >= 0.1   && < 0.2
@@ -44,8 +45,10 @@ common dependencies
                , lens                        >= 4.17  && < 4.18
                , math-functions              >= 0.3   && < 0.4
                , text                        >= 1.2   && < 1.3
+               , time                        >= 1.8   && < 2.0
                , vector                      >= 0.12  && < 0.13
                , zlib                        >= 0.6   && < 0.7
+
 
 --------------------------------------------------------------------------------
 common tool-dependencies
@@ -71,6 +74,7 @@ library
     Text.Password.Strength.Generated.Frequency
     Text.Password.Strength.Internal.Adjacency
     Text.Password.Strength.Internal.Config
+    Text.Password.Strength.Internal.Date
     Text.Password.Strength.Internal.Dictionary
     Text.Password.Strength.Internal.Estimate
     Text.Password.Strength.Internal.Keyboard
