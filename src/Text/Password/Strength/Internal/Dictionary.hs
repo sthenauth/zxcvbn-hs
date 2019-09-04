@@ -1,5 +1,3 @@
-{-# LANGUAGE TupleSections   #-}
-
 {-|
 
 Copyright:

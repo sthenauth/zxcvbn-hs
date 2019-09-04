@@ -63,6 +63,7 @@ common tool-dependencies
 --------------------------------------------------------------------------------
 library
   import: options, dependencies
+  ghc-prof-options: -fprof-auto -fprof-cafs
   hs-source-dirs: src
 
   exposed-modules:
@@ -101,6 +102,14 @@ executable zxcvbn-tools
     buildable: False
 
 --------------------------------------------------------------------------------
+executable zxcvbn-example
+  import: options, dependencies
+  main-is: Main.hs
+  hs-source-dirs: example
+  ghc-prof-options: -rtsopts
+  build-depends: zxcvbn-hs
+
+--------------------------------------------------------------------------------
 test-suite test
   import: options, dependencies
   type: exitcode-stdio-1.0
@@ -127,5 +136,6 @@ benchmark bench
   type: exitcode-stdio-1.0
   hs-source-dirs: benchmark
   main-is: Main.hs
+  ghc-prof-options: -rtsopts
   build-depends: criterion >= 1.5 && < 1.6
                , zxcvbn-hs
