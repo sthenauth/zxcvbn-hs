@@ -26,6 +26,7 @@ module Text.Password.Strength
 --------------------------------------------------------------------------------
 -- Library Imports:
 import Data.Text (Text)
+import Data.Time.Calendar (Day)
 
 --------------------------------------------------------------------------------
 -- Project Imports:
@@ -33,8 +34,8 @@ import Text.Password.Strength.Internal.Config
 import qualified Text.Password.Strength.Internal.Search as Search
 
 --------------------------------------------------------------------------------
-score :: Config -> Text -> Search.Score
-score = (Search.score .) . Search.graph
+score :: Config -> Day -> Text -> Search.Score
+score c d p = Search.score (Search.graph c d p)
 
 --------------------------------------------------------------------------------
 data Strength

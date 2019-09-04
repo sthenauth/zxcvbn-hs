@@ -25,6 +25,7 @@ import Control.Lens
 import qualified Data.Map as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
+import qualified Data.Time.Calendar as Time
 import Test.Tasty
 import Test.Tasty.HUnit
 
@@ -43,7 +44,7 @@ test = testGroup "Match"
 shouldRank :: Text -> Text -> Int -> TestTree
 shouldRank p p' n =
   testCase (Text.unpack p) $ do
-    let ms = matches en_US p
+    let ms = matches en_US ref p
         ts = filter (\t -> t ^. tokenChars == p') (Map.keys ms)
 
     t <- case ts of
@@ -60,6 +61,9 @@ shouldRank p p' n =
     getRank [] = -1
     getRank xs = minimum (map extract xs)
 
+    ref :: Time.Day
+    ref = Time.fromGregorian 2019 1 1
+
     extract :: Match -> Int
     extract (DictionaryMatch n') = n'
     extract (ReverseDictionaryMatch n') = n'
@@ -67,4 +71,4 @@ shouldRank p p' n =
     extract (KeyboardMatch _) = -1
     extract (RepeatMatch _ _) = -1
     extract (SequenceMatch _) = -1
-    extract BruteForceMatch = -1
+    extract (DateMatch _) = -1

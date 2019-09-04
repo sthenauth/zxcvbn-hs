@@ -21,6 +21,7 @@ import Test.Tasty
 
 --------------------------------------------------------------------------------
 import qualified Zxcvbn.Adjacency
+import qualified Zxcvbn.Date
 import qualified Zxcvbn.Estimate
 import qualified Zxcvbn.Match
 import qualified Zxcvbn.Search
@@ -36,4 +37,5 @@ main = defaultMain $ testGroup "zxcbn"
   , Zxcvbn.Adjacency.test
   , Zxcvbn.Repeat.test
   , Zxcvbn.Sequence.test
+  , Zxcvbn.Date.test
   ]

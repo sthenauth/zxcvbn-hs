@@ -16,12 +16,14 @@ Copyright:
 License: MIT
 
 -}
-module Zxcvbn.Estimate
+module Zxcvbn.Date
   ( test
   ) where
 
 --------------------------------------------------------------------------------
-import qualified Data.Map as Map
+import Data.Text (Text)
+import qualified Data.Text as Text
+import qualified Data.Time.Calendar as Time
 import Test.Tasty
 import Test.Tasty.HUnit
 
@@ -30,35 +32,19 @@ import Text.Password.Strength.Internal
 
 --------------------------------------------------------------------------------
 test :: TestTree
-test = testGroup "Estimate"
-  [ testCase "dict" $
-      guess token (DictionaryMatch 2) @?= 2
-
-  , testCase "dict w/ mixed case" $
-      guess uToken (DictionaryMatch 2) @?= 8
-
-  , testCase "dict w/ initial upper" $
-      guess cToken (DictionaryMatch 2) @?= 4
-
-  , testCase "reverse dict" $
-      guess token (ReverseDictionaryMatch 2) @?= 4
-
-  , testCase "l33t" $
-      guess token (L33tMatch 2 mkL33t) @?= 10
+test = testGroup "Date"
+  [ tc "1911"       (@?= Just (2019, 1,  1))
+  , tc "19101"      (@?= Just (2019, 10, 1))
+  , tc "12151966"   (@?= Just (1966, 12, 15))
+  , tc "15121966"   (@?= Just (1966, 12, 15))
+  , tc "15021966"   (@?= Just (1966, 2,  15))
+  , tc "1999-2-1"   (@?= Just (1999, 2,  1))
+  , tc "1999-02-01" (@?= Just (1999, 2,  1))
   ]
 
   where
-    token :: Token
-    token = Token "password" 0 7
+    tc :: Text -> (Maybe YMD -> Assertion) -> TestTree
+    tc label f = testCase (Text.unpack label) (f (toYMD <$> isDate ref label))
 
-    uToken :: Token
-    uToken = Token "passWord" 0 7
-
-    cToken :: Token
-    cToken = Token "Password" 0 7
-
-    mkL33t :: L33t
-    mkL33t = head (l33t $ Token "p@ssw0rd" 0 7)
-
-    guess :: Token -> Match -> Integer
-    guess t m = estimate en_US t m Map.empty
+    ref :: Time.Day
+    ref = Time.fromGregorian 2019 1 1

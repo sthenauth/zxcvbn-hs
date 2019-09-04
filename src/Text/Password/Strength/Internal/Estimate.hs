@@ -24,16 +24,17 @@ module Text.Password.Strength.Internal.Estimate
 
 --------------------------------------------------------------------------------
 -- Library Imports:
+import Data.Maybe (fromMaybe)
 import Control.Lens ((^.))
+import Data.Char (isDigit)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import Data.Maybe (fromMaybe)
-import Data.Char (isDigit)
 import qualified Data.Text as Text
 
 --------------------------------------------------------------------------------
 -- Project Imports:
 import Text.Password.Strength.Internal.Config
+import Text.Password.Strength.Internal.Date
 import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
 import Text.Password.Strength.Internal.Match
@@ -55,12 +56,15 @@ estimateAll :: Config -> Matches -> Guesses
 estimateAll cfg ms =
     Map.map (`getEstimate` estimates) estimates
   where
-    estimate' :: Token -> [Match] -> Estimates -> Integer
-    estimate' t []  e = estimate cfg t BruteForceMatch e
-    estimate' t ms' e = minimum $ map (\m -> estimate cfg t m e) ms'
+    estimate' :: Token -> [Match] -> Maybe (Estimates -> Integer)
+    estimate' _ []  = Nothing
+    estimate' t ms' = Just (\e -> minimum $ map (\m -> estimate cfg t m e) ms')
 
     estimates :: Estimates
-    estimates = Map.mapWithKey (\t m -> Estimate (estimate' t m)) ms
+    estimates =
+      let get t m = Estimate <$> estimate' t m
+          ins t m tbl = maybe tbl (\e -> Map.insert t e tbl) (get t m)
+      in Map.foldrWithKey ins Map.empty ms
 
 --------------------------------------------------------------------------------
 estimate :: Config -> Token -> Match -> Estimates -> Integer
@@ -81,9 +85,9 @@ estimate cfg token match es =
       keyboardEstimate k
 
     RepeatMatch n t ->
-      let invalid = estimate cfg t BruteForceMatch es
+      let worstcase = bruteForce $ Text.length (token ^. tokenChars)
           guess = (`getEstimate` es) <$> Map.lookup t es
-      in fromMaybe invalid guess * toInteger n
+      in fromMaybe worstcase guess * toInteger n
 
     SequenceMatch delta ->
       -- Uses the scoring equation from the paper and not from the
@@ -99,7 +103,5 @@ estimate cfg token match es =
                         | otherwise                           -> 26
       in base * len * delta'
 
-    BruteForceMatch ->
-      let j = token ^. endIndex
-          i = token ^. startIndex
-      in 10 ^ (j-i+1)
+    DateMatch d ->
+      estimateDate d

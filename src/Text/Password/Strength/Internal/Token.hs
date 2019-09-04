@@ -58,7 +58,7 @@ allTokens = outer 0
     outer :: Int -> Text -> [Token]
     outer i t
       | Text.null t = [ ]
-      | otherwise   = inner i 1 t ++ outer (i+1) (Text.drop 1 t)
+      | otherwise   = inner i 2 t ++ outer (i+1) (Text.drop 1 t)
 
     inner :: Int -> Int -> Text -> [Token]
     inner i j t

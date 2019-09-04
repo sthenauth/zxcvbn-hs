@@ -1,5 +1,4 @@
 {-# LANGUAGE RankNTypes      #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections   #-}
 
 {-|
@@ -27,17 +26,18 @@ module Text.Password.Strength.Internal.Match
 --------------------------------------------------------------------------------
 -- Library Imports:
 import Control.Lens ((^.), _1, views, minimumByOf)
-import Control.Lens.TH (makePrisms)
 import Data.Function (on)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Maybe (mapMaybe, catMaybes)
 import Data.Text (Text)
 import qualified Data.Text as Text
+import Data.Time.Calendar (Day)
 
 --------------------------------------------------------------------------------
 -- Project Imports:
 import Text.Password.Strength.Internal.Config
+import Text.Password.Strength.Internal.Date
 import Text.Password.Strength.Internal.Dictionary
 import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
@@ -78,13 +78,10 @@ data Match
     --   * abc
     ---  * 135
 
-  | BruteForceMatch
-    -- ^ The associated token does not match any other algorithm from
-    -- above.
+  | DateMatch Date
+    -- ^ The associated token wholly contains a date.
 
   deriving Show
-
-makePrisms ''Match
 
 --------------------------------------------------------------------------------
 -- | Information about how a token matches a specific match pattern.
@@ -92,22 +89,16 @@ type Matches = Map Token [Match]
 
 --------------------------------------------------------------------------------
 -- | All possible matches after various transformations.
-matches :: Config -> Text -> Matches
-matches config =
+matches :: Config -> Day -> Text -> Matches
+matches config day =
     repeats .
       foldr (\t -> Map.insert t (check t)) Map.empty .
         allTokens
   where
     check :: Token -> [Match]
-    check t =
-      let ms = catMaybes [ dict t
-                         , rdict t
-                         , l33ts t
-                         , seqMatch t
-                         ] ++ kbd t
-      in case ms of
-           [] -> [BruteForceMatch]
-           xs -> xs
+    check t = catMaybes
+      [dict t, rdict t, l33ts t, seqMatch t, dateMatch t]
+      ++ kbd t
 
     -- Tokens that appear in a dictionary.
     dict :: Token -> Maybe Match
@@ -148,3 +139,7 @@ matches config =
     -- Characters in a token form a sequence.
     seqMatch :: Token -> Maybe Match
     seqMatch t = SequenceMatch <$> isSequence (t ^. tokenChars)
+
+    -- Characters in a token form a date.
+    dateMatch :: Token -> Maybe Match
+    dateMatch t = DateMatch <$> isDate day (t ^. tokenChars)

@@ -72,7 +72,7 @@ keyboardEstimate (KeyboardPattern (s, d, _, a)) =
     --   * The other implementations don't seem to divide the outer
     --     sum by two but the equation clearly does.
     e3 :: Integer
-    e3 = (`div` 2) . sum $ do
+    e3 = max 1 . (`div` 2) . sum $ do
       i <- [2 .. (a ^. patternLength)]
       j <- [1 .. min (a ^. totalTurns) (i - 1)]
       pure $ floor (choose (i - 1) (j - 1)) * toInteger s * (toInteger d ^ j)

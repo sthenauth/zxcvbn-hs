@@ -17,6 +17,7 @@ License: MIT
 module Text.Password.Strength.Internal.Math
   ( variations
   , variations'
+  , bruteForce
   , caps
   ) where
 
@@ -39,7 +40,7 @@ import Text.Password.Strength.Internal.Token
 variations :: Int -> Int -> Integer
 variations 0 _ = 1
 variations _ 0 = 1
-variations u l = sum (floor . choose (u+l) <$> [1 .. min u l]) `div` 2
+variations u l = max 1 (sum (floor . choose (u+l) <$> [1 .. min u l]) `div` 2)
 
 --------------------------------------------------------------------------------
 -- | Like equation 2, but modified for l33t and keyboard variations.
@@ -51,6 +52,11 @@ variations' :: Int -> Int -> Integer
 variations' 0 _ = 2
 variations' _ 0 = 2
 variations' u l = variations u l
+
+--------------------------------------------------------------------------------
+-- | Calculate the brute force score for text with the given length.
+bruteForce :: Int -> Integer
+bruteForce = (10 ^)
 
 --------------------------------------------------------------------------------
 -- | Score the use of uppercase letters according to the paper.  This

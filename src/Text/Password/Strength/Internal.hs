@@ -26,6 +26,7 @@ module Text.Password.Strength.Internal
   , module Text.Password.Strength.Internal.Keyboard
   , module Text.Password.Strength.Internal.Repeat
   , module Text.Password.Strength.Internal.Sequence
+  , module Text.Password.Strength.Internal.Date
   ) where
 
 
@@ -40,3 +41,4 @@ import Text.Password.Strength.Internal.Adjacency
 import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.Repeat
 import Text.Password.Strength.Internal.Sequence
+import Text.Password.Strength.Internal.Date
