@@ -120,3 +120,12 @@ test-suite test
     Zxcvbn.Repeat
     Zxcvbn.Search
     Zxcvbn.Sequence
+
+--------------------------------------------------------------------------------
+benchmark bench
+  import: options, dependencies
+  type: exitcode-stdio-1.0
+  hs-source-dirs: benchmark
+  main-is: Main.hs
+  build-depends: criterion >= 1.5 && < 1.6
+               , zxcvbn-hs

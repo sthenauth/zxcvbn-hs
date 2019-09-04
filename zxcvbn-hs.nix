@@ -1,5 +1,5 @@
 { mkDerivation, attoparsec, base, base64-bytestring, cereal
-, cereal-text, containers, fgl, filepath, hedgehog, lens
+, cereal-text, containers, criterion, fgl, filepath, hedgehog, lens
 , math-functions, mtl, optparse-applicative, pipes, pipes-safe
 , pipes-text, stdenv, tasty, tasty-hedgehog, tasty-hunit, text
 , time, vector, zlib
@@ -23,6 +23,10 @@ mkDerivation {
     attoparsec base base64-bytestring cereal cereal-text containers fgl
     hedgehog lens math-functions tasty tasty-hedgehog tasty-hunit text
     time vector zlib
+  ];
+  benchmarkHaskellDepends = [
+    attoparsec base base64-bytestring cereal cereal-text containers
+    criterion fgl lens math-functions text time vector zlib
   ];
   license = stdenv.lib.licenses.mit;
 }

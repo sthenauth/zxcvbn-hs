@@ -20,4 +20,5 @@ let
     overrides = pkgs.lib.composeExtensions
       (orig.overrides or (_: _: {})) overrides; });
 
-in haskell.callPackage ./zxcvbn-hs.nix { }
+in pkgs.haskell.lib.doBenchmark
+     (haskell.callPackage ./zxcvbn-hs.nix { })
