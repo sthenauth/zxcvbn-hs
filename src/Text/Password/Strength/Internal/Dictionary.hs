@@ -18,14 +18,11 @@ module Text.Password.Strength.Internal.Dictionary
   ( Dictionary
   , Rank
   , rank
-  , rankFromAll
   ) where
 
 --------------------------------------------------------------------------------
 -- Library Imports:
-import Control.Lens ((^.))
-import Control.Monad (join)
-import qualified Data.Map.Strict as Map
+import qualified Data.HashMap.Strict as HashMap
 import Data.Maybe (mapMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
@@ -39,25 +36,17 @@ import Text.Password.Strength.Internal.Config
 type Rank = Int
 
 --------------------------------------------------------------------------------
--- | Look up the given value in a given dictionary.
-rank :: (a -> Text) -> a -> Dictionary -> Maybe Rank
-rank f a = Map.lookup (Text.toLower $ f a)
-
---------------------------------------------------------------------------------
 -- | Look up the given value in all configured dictionaries,
 -- transforming each input with the given function.  The lowest ranked
 -- score is return if it is found.
-rankFromAll :: Config -> (a -> Text) -> a -> Maybe Rank
-rankFromAll c f a =
-  case check dicts of
+rank :: Config -> (a -> Text) -> a -> Maybe Rank
+rank c f a =
+  case check (dictionaries c) of
     [] -> Nothing
     xs -> Just (minimum xs)
   where
     check :: [Dictionary] -> [Rank]
-    check = mapMaybe (rank f a)
+    check = mapMaybe (HashMap.lookup key)
 
-    dicts :: [Dictionary]
-    dicts = join [ c ^. passwordLists
-                 , c ^. wordFrequencyLists
-                 , c ^. customFrequencyLists
-                 ]
+    key :: Text
+    key = Text.toLower (f a)

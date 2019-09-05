@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass  #-}
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -45,7 +46,7 @@ import Data.List.NonEmpty (NonEmpty)
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Serialize (Serialize)
+import Data.Binary (Binary)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import GHC.Generics (Generic)
@@ -56,21 +57,15 @@ type Pattern = (Char, Char)
 
 --------------------------------------------------------------------------------
 data Direction = N | NE | E | SE | S | SW | W | NW
-  deriving (Generic, Show, Eq, Ord, Enum, Bounded)
-
-instance Serialize Direction
+  deriving (Generic, Binary, Show, Eq, Ord, Enum, Bounded)
 
 --------------------------------------------------------------------------------
 data Move = Move Direction | Stay
-  deriving (Generic, Show, Eq)
-
-instance Serialize Move
+  deriving (Generic, Binary, Show, Eq)
 
 --------------------------------------------------------------------------------
 data Layer = Primary | Secondary
-  deriving (Generic, Show, Eq, Ord, Enum, Bounded)
-
-instance Serialize Layer
+  deriving (Generic, Binary, Show, Eq, Ord, Enum, Bounded)
 
 --------------------------------------------------------------------------------
 -- | Information about how two characters are related to one another.
@@ -84,11 +79,9 @@ data Adjacency = Adjacency
   , _secondLayer :: Layer
     -- ^ The layer that the second character is on.
   }
-  deriving (Generic, Show)
+  deriving (Generic, Binary, Show)
 
 makeLenses ''Adjacency
-
-instance Serialize Adjacency
 
 --------------------------------------------------------------------------------
 -- | An adjacency graph (usually representing a single keyboard).
@@ -103,11 +96,9 @@ data AdjacencyTable = AdjacencyTable
   , _patterns :: Map Pattern Adjacency
     -- ^ Dictionary for looking up patterns.
 
-  } deriving (Generic, Show)
+  } deriving (Generic, Binary, Show)
 
 makeLenses ''AdjacencyTable
-
-instance Serialize AdjacencyTable
 
 --------------------------------------------------------------------------------
 -- | Find a pattern if it exists.  If all characters in the given

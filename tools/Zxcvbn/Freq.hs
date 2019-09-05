@@ -25,10 +25,9 @@ module Zxcvbn.Freq
 -- Imports:
 import Control.Monad (forM_, foldM)
 import Data.Char (isSpace)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Maybe (fromMaybe)
-import Data.Serialize.Text ()
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Read as Text
@@ -59,13 +58,13 @@ data Entry = Entry
 
 --------------------------------------------------------------------------------
 -- | The temporary map used to hold all frequency lists.
-type Freqs = Map Text Entry
+type Freqs = HashMap Text Entry
 
 --------------------------------------------------------------------------------
 -- | Insert an entry into the map.  If the entry is already in the
 -- table keep the one with the lowest rank.
 insert :: (Text, Entry) -> Freqs -> Freqs
-insert (word, ent) = Map.insertWith go word ent
+insert (word, ent) = HashMap.insertWith go word ent
   where
     go :: Entry -> Entry -> Entry
     go new old = if rank new < rank old then new else old
@@ -102,18 +101,18 @@ processList lst tbl = runSafeT $ runEffect $
 --------------------------------------------------------------------------------
 -- | Alias for a map whose keys are list names and values are a map of
 -- words and ranks.
-type Lists = Map Text (Map Text Int)
+type Lists = HashMap Text (HashMap Text Int)
 
 --------------------------------------------------------------------------------
 -- | Given a @Freqs@ table, extract all the component lists.
 extractLists :: Freqs -> Lists
-extractLists = Map.foldrWithKey go Map.empty
+extractLists = HashMap.foldrWithKey go HashMap.empty
   where
     go :: Text -> Entry -> Lists -> Lists
     go word Entry{..} = ins (name list) word rank
 
     ins :: Text -> Text -> Int -> Lists -> Lists
-    ins lst word rnk = Map.insertWith Map.union lst (Map.singleton word rnk)
+    ins lst word rnk = HashMap.insertWith HashMap.union lst (HashMap.singleton word rnk)
 
 --------------------------------------------------------------------------------
 -- | Turn a file name with an optional line number limit into a 'List'.
@@ -139,7 +138,7 @@ run Global{..} = do
   putStr (header $ fromMaybe "Text.Password.Strength.Generated.Frequency" mname)
   putStr "import Text.Password.Strength.Internal.Adjacency\n\n"
 
-  ls <- extractLists <$> foldM (flip processList) Map.empty (map mkList files)
+  ls <- extractLists <$> foldM (flip processList) HashMap.empty (map mkList files)
 
-  forM_ (Map.assocs ls) $ \(lst, tbl) ->
-    putStrLn (encode (Text.unpack lst) "Map Text Int" tbl)
+  forM_ (HashMap.toList ls) $ \(lst, tbl) ->
+    putStrLn (encode (Text.unpack lst) "HashMap Text Int" tbl)

@@ -22,6 +22,7 @@ module Text.Password.Strength.Internal.Config
   , HasConfig
   , Dictionary
   , en_US
+  , dictionaries
   , addPasswordDict
   , addWordFrequencyDict
   , addCustomFrequencyList
@@ -37,8 +38,9 @@ module Text.Password.Strength.Internal.Config
 -- Library Imports:
 import Control.Lens ((&), (^.), (.~), (%~))
 import Control.Lens.TH (makeClassy)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Control.Monad (join)
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Text (Text)
 import Data.Vector (Vector)
 import qualified Data.Vector as Vector
@@ -51,7 +53,7 @@ import Text.Password.Strength.Internal.Adjacency (AdjacencyTable)
 
 --------------------------------------------------------------------------------
 -- | Type alias for a frequency database.
-type Dictionary = Map Text Int
+type Dictionary = HashMap Text Int
 
 --------------------------------------------------------------------------------
 -- | A type to control which dictionaries, keyboard layouts, etc. will
@@ -116,14 +118,22 @@ en_US = Config{..}
       c == '0' || c == '1' || c == '9'
 
 --------------------------------------------------------------------------------
+-- | Access all configured dictionaries.
+dictionaries :: Config -> [Dictionary]
+dictionaries c = join [ c ^. passwordLists
+                      , c ^. wordFrequencyLists
+                      , c ^. customFrequencyLists
+                      ]
+
+--------------------------------------------------------------------------------
 -- | Add a password frequency dictionary.
 --
 -- It's best to generate a dictionary from text data using the tools
 -- provided in this package's @tools@ directory.
 --
 -- If manually generating the dictionary, keep in mind that the @Int@
--- value in the @Map@ represents the number of guesses required to
--- crack the password (which is the key of the @Map@).  The number of
+-- value in the @HashMap@ represents the number of guesses required to
+-- crack the password (which is the key of the @HashMap@).  The number of
 -- guesses should be @>= 1@.
 addPasswordDict :: Dictionary -> Config -> Config
 addPasswordDict d = passwordLists %~ (d:)
@@ -142,7 +152,7 @@ addCustomFrequencyList :: Vector Text -> Config -> Config
 addCustomFrequencyList v = addDict (mkDict v)
   where
     mkDict :: Vector Text -> Dictionary
-    mkDict = Vector.ifoldr (\i x -> Map.insert x (i+1)) Map.empty
+    mkDict = Vector.ifoldr (\i x -> HashMap.insert x (i+1)) HashMap.empty
 
     addDict :: Dictionary -> Config -> Config
     addDict d = customFrequencyLists %~ (d:)

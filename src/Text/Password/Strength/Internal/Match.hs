@@ -102,12 +102,12 @@ matches config day =
 
     -- Tokens that appear in a dictionary.
     dict :: Token -> Maybe Match
-    dict t = DictionaryMatch <$> rankFromAll config (^. tokenChars) t
+    dict t = DictionaryMatch <$> rank config (^. tokenChars) t
 
     -- Tokens that, when reversed, appear in a dictionary.
     rdict :: Token -> Maybe Match
     rdict t = ReverseDictionaryMatch <$>
-                rankFromAll config (views tokenChars Text.reverse) t
+                rank config (views tokenChars Text.reverse) t
 
     -- Tokens that, when decoded, appear in a dictionary.
     --
@@ -117,7 +117,7 @@ matches config day =
     l33ts :: Token -> Maybe Match
     l33ts t =
       let ts = l33t t -- Decoding may result in multiple outputs.
-          rnk l = (,l) <$> rankFromAll config (^. l33tText) l
+          rnk l = (,l) <$> rank config (^. l33tText) l
       in uncurry L33tMatch <$>
            minimumByOf traverse (compare `on` (^. _1))
                                 (mapMaybe rnk ts)

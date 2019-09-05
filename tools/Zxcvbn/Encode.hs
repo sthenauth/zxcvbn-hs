@@ -21,9 +21,10 @@ module Zxcvbn.Encode
 
 --------------------------------------------------------------------------------
 -- Imports:
-import Data.Serialize (Serialize)
-import qualified Data.Serialize as Serialize
+import Data.Binary (Binary)
+import Data.Binary.Orphans ()
 import qualified Codec.Compression.GZip as GZip
+import qualified Data.Binary as Binary
 import qualified Data.ByteString.Base64.Lazy as Base64
 
 --------------------------------------------------------------------------------
@@ -40,29 +41,29 @@ header m =
           , "{-# OPTIONS_GHC -Wno-missing-export-lists #-}\n"
           , "{-# OPTIONS_GHC -Wno-unused-imports #-}\n"
           , "module " <> m <> " where\n"
-          , "import Data.Map.Strict (Map)\n"
-          , "import Data.Serialize.Text ()\n"
+          , "import Data.HashMap.Strict (HashMap)\n"
+          , "import qualified Data.HashMap.Strict as HashMap\n"
           , "import Data.Text (Text)\n"
           , "import qualified Codec.Compression.GZip as GZip\n"
           , "import qualified Data.ByteString.Base64.Lazy as Base64\n"
-          , "import qualified Data.Serialize as Serialize\n"
+          , "import qualified Data.Binary as Binary\n"
+          , "import Data.Binary.Orphans ()\n"
           ]
 
 --------------------------------------------------------------------------------
 -- | Encode a value and bundle it with a function that can decode it.
-encode :: (Serialize a) => FunctionName -> TypeSig -> a -> String
+encode :: (Binary a) => FunctionName -> TypeSig -> a -> String
 encode n t a =
   mconcat [ n <>  " :: " <> t <> "\n"
           , n <> " =\n"
           , "  let decode = " <> decode <> "\n"
           , "  in  decode "
-          , show . Base64.encode . GZip.compress . Serialize.encodeLazy $ a
+          , show . Base64.encode . GZip.compress . Binary.encode $ a
           , "\n"
           ]
   where
     decode =
-      mconcat [ "either error id . "
-              , "Serialize.decodeLazy . "
+      mconcat [ "Binary.decode . "
               , "GZip.decompress . "
               , "Base64.decodeLenient"
               ]
