@@ -29,13 +29,14 @@ module Text.Password.Strength.Internal.Date
 import Control.Lens ((&), (^.), (+~), _1)
 import Control.Lens.TH (makeLenses)
 import qualified Data.Attoparsec.Text as Atto
+import Data.Char (isDigit)
 import Data.Char (isSpace)
+import Data.Function (on)
 import Data.List (sortBy)
 import Data.Maybe (catMaybes, listToMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Read as Text
-import Data.Function (on)
 import qualified Data.Time.Calendar as Time
 
 --------------------------------------------------------------------------------
@@ -139,7 +140,9 @@ type Arrange a = Read3 a -> Read3 a
 --------------------------------------------------------------------------------
 -- | Extract all possible date combinations from the given text.
 dateSansSep :: Text -> [YMD]
-dateSansSep t = catMaybes
+dateSansSep t
+  | not (Text.all isDigit t) = []
+  | otherwise = catMaybes
   [ take3 (1, 1, 2) dmy
   , take3 (2, 1, 1) ymd
   , take3 (2, 2, 0) ym_
