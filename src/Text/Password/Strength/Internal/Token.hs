@@ -77,11 +77,22 @@ allTokens = outer 0
       in Token chars (Text.toLower chars) i (i + j)
 
 --------------------------------------------------------------------------------
-translateMap :: (Char -> [Char]) -> Text -> [Text]
-translateMap f = Text.foldl fork [Text.empty]
+-- | Translate the characters of a 'Text' value.
+--
+-- Given a function that translates a character into one or more
+-- characters, return all possible translations.
+--
+-- Examples:
+--
+-- >>> translateMap l33t2Eng "p111
+-- ["piii","plii","pili","plli","piil","plil","pill","plll"]
+translateMap :: (Char -> String) -> Text -> [Text]
+translateMap f = map Text.pack . Text.foldr fork [""]
   where
-    fork :: [Text] -> Char -> [Text]
-    fork ts c =
+    fork :: Char -> [String] -> [String]
+    fork c cs =
       case f c of
-        [] -> map (`Text.snoc` c) ts
-        xs -> concatMap (\c' -> map (`Text.snoc` c') ts) xs
+        [] -- No translations so keep the existing char:
+          -> map (c:) cs
+        xs -- Add (length xs) new forks of the text:
+          -> concatMap (\c' -> map (c':) cs) xs

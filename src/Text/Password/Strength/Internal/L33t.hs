@@ -24,6 +24,7 @@ module Text.Password.Strength.Internal.L33t
   , l33tText
   , l33tSub
   , l33tUnsub
+  , l33t2Eng
   ) where
 
 --------------------------------------------------------------------------------
@@ -56,19 +57,21 @@ makeLenses ''L33t
 --------------------------------------------------------------------------------
 -- | Translate a token from l33t, counting l33t characters.
 l33t :: Token -> [L33t]
-l33t = filter hasSubs . map count . trans
+l33t token
+  | not (Text.any ((>0) . l33tCount) chars) = []
+  | otherwise = filter hasSubs (map count trans)
   where
     hasSubs :: L33t -> Bool
     hasSubs L33t{..} = _l33tSub > 0 || _l33tUnsub > 0
 
-    chars :: Token -> Text
-    chars = (^. tokenLower)
+    chars :: Text
+    chars = (token ^. tokenLower)
 
-    trans :: Token -> [(Token, Text)]
-    trans t = case translateMap l33t2Eng (chars t) of
-                [x] | x == chars t -> []
-                    | otherwise    -> [(t, x)]
-                xs                 -> map (t,) xs
+    trans :: [(Token, Text)]
+    trans  = case translateMap l33t2Eng chars of
+               [x] | x == chars -> []
+                   | otherwise  -> [(token, x)]
+               xs               -> map (token,) xs
 
     count :: (Token, Text) -> L33t
     count (tk, text) =

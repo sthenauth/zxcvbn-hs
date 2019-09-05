@@ -30,14 +30,17 @@ main :: IO ()
 main = defaultMain
   [ go "password"
   , go "password1999"
+  , go "passwordpasswordp@ssw0rd"
+  , go "passwordasdftasdft"
   , go "YohMei9eeb6Ahrohrahk"
   , go "P!@'XrC4b%-#Ldcd9aqJ+`;'VfjnWe"
+  , go "#]HtCNk#`#@)n\49Kq!m/i9@phtg)|Re'wNuy@}F^s|9ip$/v-*fFg:p<X9."
   ]
 
   where
     go :: Text -> Benchmark
     go p = bench (Text.unpack p) $
-             nf (Zxcvbn.getScore . Zxcvbn.score Zxcvbn.en_US refDay) p
+             whnf (Zxcvbn.getScore . Zxcvbn.score Zxcvbn.en_US refDay) p
 
     refDay :: Time.Day
     refDay = Time.fromGregorian 2019 1 1
