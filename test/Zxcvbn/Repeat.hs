@@ -35,9 +35,9 @@ import Text.Password.Strength.Internal
 --------------------------------------------------------------------------------
 test :: TestTree
 test = testGroup "Repeat"
-  [ tc "wordword"      "word" $ Just (2, Token "wordword" 0 7)
-  , tc "wordword@word" "word" $ Just (2, Token "wordword" 0 7)
-  , tc "word@wordword" "word" $ Just (2, Token "wordword" 5 12)
+  [ tc "wordword"      "word" $ Just (2, Token "wordword" "wordword" 0 7)
+  , tc "wordword@word" "word" $ Just (2, Token "wordword" "wordword" 0 7)
+  , tc "word@wordword" "word" $ Just (2, Token "wordword" "wordword" 5 12)
   , tc "word2word"     "word" Nothing
   , tc "word"          "word" Nothing
   , tc "abcdefg"       "abc"  Nothing
@@ -46,7 +46,7 @@ test = testGroup "Repeat"
   where
     tc :: Text -> Text -> Maybe (Int, Token) -> TestTree
     tc p t r = testCase (Text.unpack p) $
-      repeatMatch (rmap p) (Token t 0 0) @?= r
+      repeatMatch (rmap p) (Token t (Text.toLower t) 0 0) @?= r
 
     tmap :: Text -> Map Token ()
     tmap = Map.fromList . map (,()) . allTokens

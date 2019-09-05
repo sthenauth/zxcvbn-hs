@@ -24,6 +24,7 @@ module Text.Password.Strength.Internal.Token (
 
     -- * Lenses for the 'Token' Type
     tokenChars,
+    tokenLower,
     startIndex,
     endIndex,
 
@@ -32,13 +33,16 @@ module Text.Password.Strength.Internal.Token (
   ) where
 
 --------------------------------------------------------------------------------
+-- Library Imports:
 import Control.Lens.TH (makeLenses)
 import Data.Text (Text)
 import qualified Data.Text as Text
 
 --------------------------------------------------------------------------------
+-- | A token is a substring of a password.
 data Token = Token
   { _tokenChars :: Text
+  , _tokenLower :: Text
   , _startIndex :: Int
   , _endIndex   :: Int
   } deriving (Show, Eq, Ord)
@@ -46,12 +50,14 @@ data Token = Token
 makeLenses ''Token
 
 --------------------------------------------------------------------------------
--- | Extract all substrings from the input 'Text'.
+-- | Extract all substrings from the input 'Text'.  A substring has a
+-- minimum character length of 3 for performance and to prevent false
+-- positives for matches such as sequences and repeats.
 --
 -- Examples:
 --
--- >>> allTokens "abcdef"
---
+-- >>> map _tokenChars (allTokens "abcdef")
+-- ["abc","abcd","abcde","abcdef","bcd","bcde","bcdef","cde","cdef","def"]
 allTokens :: Text -> [Token]
 allTokens = outer 0
   where
@@ -63,7 +69,12 @@ allTokens = outer 0
     inner :: Int -> Int -> Text -> [Token]
     inner i j t
       | Text.compareLength t (j+1) == LT = [ ]
-      | otherwise = Token (Text.take (j+1) t) i (i+j) : inner i (j+1) t
+      | otherwise = mkT i j t : inner i (j+1) t
+
+    mkT :: Int -> Int -> Text -> Token
+    mkT i j t =
+      let chars = Text.take (j+1) t
+      in Token chars (Text.toLower chars) i (i + j)
 
 --------------------------------------------------------------------------------
 translateMap :: (Char -> [Char]) -> Text -> [Text]

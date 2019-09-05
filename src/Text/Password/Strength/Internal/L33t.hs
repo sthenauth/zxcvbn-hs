@@ -62,7 +62,7 @@ l33t = filter hasSubs . map count . trans
     hasSubs L33t{..} = _l33tSub > 0 || _l33tUnsub > 0
 
     chars :: Token -> Text
-    chars = (^. tokenChars)
+    chars = (^. tokenLower)
 
     trans :: Token -> [(Token, Text)]
     trans t = case translateMap l33t2Eng (chars t) of

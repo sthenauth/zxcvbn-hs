@@ -25,7 +25,6 @@ module Text.Password.Strength.Internal.Dictionary
 import qualified Data.HashMap.Strict as HashMap
 import Data.Maybe (mapMaybe)
 import Data.Text (Text)
-import qualified Data.Text as Text
 
 --------------------------------------------------------------------------------
 -- Project Imports:
@@ -49,4 +48,4 @@ rank c f a =
     check = mapMaybe (HashMap.lookup key)
 
     key :: Text
-    key = Text.toLower (f a)
+    key = f a

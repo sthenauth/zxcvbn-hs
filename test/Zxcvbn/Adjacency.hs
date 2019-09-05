@@ -26,6 +26,7 @@ import Data.Foldable (foldl')
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Text (Text)
+import qualified Data.Text as Text
 import Test.Tasty
 import Test.Tasty.HUnit
 
@@ -52,7 +53,7 @@ simpleGraph =  AdjacencyTable
 scoreQwerty :: Text -> Maybe Integer
 scoreQwerty password =
   keyboardEstimate <$> keyboardPattern (en_US ^. keyboardGraphs.to head)
-                                       (Token password 0 5)
+                         (Token password (Text.toLower password) 0 5)
 
 --------------------------------------------------------------------------------
 test :: TestTree

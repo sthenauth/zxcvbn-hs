@@ -88,7 +88,9 @@ repeatMatch m t =
     mkToken (n, ts) = Just $
       let s = head ts ^. startIndex
           e = last ts ^. endIndex
-      in (n, Token (Text.replicate n (t ^. tokenChars)) s e)
+          c = Text.replicate n (t ^. tokenChars)
+          l = Text.replicate n (t ^. tokenLower)
+      in (n, Token c l s e)
 
     lineUp :: [Token] -> [(Token, Token)]
     lineUp xs = zip xs (drop 1 xs)

@@ -49,16 +49,16 @@ test = testGroup "Estimate"
 
   where
     token :: Token
-    token = Token "password" 0 7
+    token = Token "password" "password" 0 7
 
     uToken :: Token
-    uToken = Token "passWord" 0 7
+    uToken = Token "passWord" "password" 0 7
 
     cToken :: Token
-    cToken = Token "Password" 0 7
+    cToken = Token "Password" "password" 0 7
 
     mkL33t :: L33t
-    mkL33t = head (l33t $ Token "p@ssw0rd" 0 7)
+    mkL33t = head (l33t $ Token "p@ssw0rd" "p@ssw0rd" 0 7)
 
     guess :: Token -> Match -> Integer
     guess t m = estimate en_US t m Map.empty

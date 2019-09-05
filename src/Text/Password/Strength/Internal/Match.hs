@@ -102,12 +102,12 @@ matches config day =
 
     -- Tokens that appear in a dictionary.
     dict :: Token -> Maybe Match
-    dict t = DictionaryMatch <$> rank config (^. tokenChars) t
+    dict t = DictionaryMatch <$> rank config (^. tokenLower) t
 
     -- Tokens that, when reversed, appear in a dictionary.
     rdict :: Token -> Maybe Match
     rdict t = ReverseDictionaryMatch <$>
-                rank config (views tokenChars Text.reverse) t
+                rank config (views tokenLower Text.reverse) t
 
     -- Tokens that, when decoded, appear in a dictionary.
     --
