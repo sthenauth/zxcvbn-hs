@@ -26,7 +26,6 @@ module Text.Password.Strength.Internal.Estimate
 -- Library Imports:
 import Data.Maybe (fromMaybe)
 import Control.Lens ((^.))
-import Data.Char (isDigit)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as Text
@@ -39,6 +38,7 @@ import Text.Password.Strength.Internal.Keyboard
 import Text.Password.Strength.Internal.L33t
 import Text.Password.Strength.Internal.Match
 import Text.Password.Strength.Internal.Math
+import Text.Password.Strength.Internal.Sequence
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
@@ -84,24 +84,13 @@ estimate cfg token match es =
     KeyboardMatch k ->
       keyboardEstimate k
 
+    SequenceMatch delta ->
+      estimateSequence cfg (token ^. tokenChars) delta
+
+    DateMatch d ->
+      estimateDate d
+
     RepeatMatch n t ->
       let worstcase = bruteForce $ Text.length (token ^. tokenChars)
           guess = (`getEstimate` es) <$> Map.lookup t es
       in fromMaybe worstcase guess * toInteger n
-
-    SequenceMatch delta ->
-      -- Uses the scoring equation from the paper and not from the
-      -- other implementations which don't even use the calculated
-      -- delta.  The only change from the paper is to compensated for
-      -- a delta of 0, which isn't accounted for in the paper.
-      let len    = toInteger $ Text.length (token ^. tokenChars)
-          start  = if len > 0 then Text.head (token ^. tokenChars) else '\0'
-          delta' = toInteger (if delta == 0 then 1 else abs delta)
-          base   = case () of
-                     () | (cfg ^. obviousSequenceStart) start -> 4
-                        | isDigit start                       -> 10
-                        | otherwise                           -> 26
-      in base * len * delta'
-
-    DateMatch d ->
-      estimateDate d

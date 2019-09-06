@@ -64,11 +64,6 @@ data Match
     -- ^ The associated token is wholly made up of an adjacent
     -- sequence of characters that make a pattern on a keyboard.
 
-  | RepeatMatch Repeat Token
-    -- ^ The associated token is an adjacent repeat of another token
-    -- (the one given to this constructor).  The number of times it
-    -- repeats is given as 'Repeat'.
-
   | SequenceMatch Delta
     -- ^ The characters of the associated token form a sequence
     -- because the delta between all the characters is the same.
@@ -80,6 +75,11 @@ data Match
 
   | DateMatch Date
     -- ^ The associated token wholly contains a date.
+
+  | RepeatMatch Repeat Token
+    -- ^ The associated token is an adjacent repeat of another token
+    -- (the one given to this constructor).  The number of times it
+    -- repeats is given as 'Repeat'.
 
   deriving Show
 
@@ -128,14 +128,6 @@ matches config day =
               mapMaybe (`keyboardPattern` t)
                 (config ^. keyboardGraphs)
 
-    -- Tokens that are repeats of some other token.
-    repeats :: Matches -> Matches
-    repeats ms =
-      let rmap = mkRepeatMap ms
-          f t = (\(n, t') -> (t', [RepeatMatch n t])) <$> repeatMatch rmap t
-          g t m = maybe m (\(k,v) -> Map.insertWith (<>) k v m) (f t)
-      in Map.foldrWithKey (const . g) ms ms
-
     -- Characters in a token form a sequence.
     seqMatch :: Token -> Maybe Match
     seqMatch t = SequenceMatch <$> isSequence (t ^. tokenChars)
@@ -143,3 +135,11 @@ matches config day =
     -- Characters in a token form a date.
     dateMatch :: Token -> Maybe Match
     dateMatch t = DateMatch <$> isDate day (t ^. tokenChars)
+
+    -- Tokens that are repeats of some other token.
+    repeats :: Matches -> Matches
+    repeats ms =
+      let rmap = mkRepeatMap ms
+          f t = (\(n, t') -> (t', [RepeatMatch n t])) <$> repeatMatch rmap t
+          g t m = maybe m (\(k,v) -> Map.insertWith (<>) k v m) (f t)
+      in Map.foldrWithKey (const . g) ms ms
