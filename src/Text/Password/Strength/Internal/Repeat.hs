@@ -14,11 +14,12 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Repeat
-  ( RepeatMap
-  , Repeat
-  , mkRepeatMap
-  , repeatMatch
+module Text.Password.Strength.Internal.Repeat (
+  -- * Repeating Token Matches
+  RepeatMap,
+  Repeat,
+  mkRepeatMap,
+  repeatMatch
   ) where
 
 --------------------------------------------------------------------------------

@@ -16,16 +16,17 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Search
-  ( Graph(..)
-  , Node
-  , Edge
-  , edges
-  , bfEdges
-  , graph
-  , Score(..)
-  , score
-  , shortestPath
+module Text.Password.Strength.Internal.Search (
+  -- * Searching for the Weakest Path Through a Password
+  Graph(..),
+  Node,
+  Edge,
+  edges,
+  bfEdges,
+  graph,
+  Score(..),
+  score,
+  shortestPath
   ) where
 
 --------------------------------------------------------------------------------
@@ -77,7 +78,8 @@ edges c d p = Map.mapKeys loc (estimateAll c (matches c d p))
     loc t = (t ^. startIndex, t ^. endIndex + 1)
 
 --------------------------------------------------------------------------------
--- Brute force edges.
+-- | Brute force edges.  In other words, the edges required to ensure
+-- there's a path in the graph from the start node to the end node.
 bfEdges :: Text -> Map (Int, Int) Integer -> [((Int, Int), Integer)]
 bfEdges p es = mapMaybe (fmap guesses . check) rows
 

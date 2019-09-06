@@ -29,5 +29,6 @@ mkDerivation {
     criterion fgl lens math-functions text time unordered-containers
     vector zlib
   ];
+  description = "Password strength estimation based on zxcvbn";
   license = stdenv.lib.licenses.mit;
 }

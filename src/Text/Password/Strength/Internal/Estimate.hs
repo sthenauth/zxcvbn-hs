@@ -14,12 +14,13 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Estimate
-  ( Guesses
-  , Estimates
-  , Estimate(..)
-  , estimateAll
-  , estimate
+module Text.Password.Strength.Internal.Estimate (
+  -- * Estimate Matched Tokens
+  Guesses,
+  Estimates,
+  Estimate(..),
+  estimateAll,
+  estimate,
   ) where
 
 --------------------------------------------------------------------------------
@@ -42,16 +43,23 @@ import Text.Password.Strength.Internal.Sequence
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
-type Estimates = Map Token Estimate
-
---------------------------------------------------------------------------------
+-- | Final mapping of a token to its lowest score.
 type Guesses = Map Token Integer
 
 --------------------------------------------------------------------------------
+-- | Map of partially applied estimates.
+type Estimates = Map Token Estimate
+
+--------------------------------------------------------------------------------
+-- | A function that will produce an estimate once we know the
+-- estimates for other tokens.  This is necessary to score repeat
+-- matches since they require looking up the score for a different
+-- token.
 newtype Estimate = Estimate
   { getEstimate :: Estimates -> Integer }
 
 --------------------------------------------------------------------------------
+-- | Estimate all of the given matches.
 estimateAll :: Config -> Matches -> Guesses
 estimateAll cfg ms =
     Map.map (`getEstimate` estimates) estimates
@@ -67,6 +75,7 @@ estimateAll cfg ms =
       in Map.foldrWithKey ins Map.empty ms
 
 --------------------------------------------------------------------------------
+-- | Estimate a single match.
 estimate :: Config -> Token -> Match -> Estimates -> Integer
 estimate cfg token match es =
   case match of

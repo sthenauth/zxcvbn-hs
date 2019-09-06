@@ -13,14 +13,25 @@ Copyright:
 
 License: MIT
 
+This is a native Haskell implementation of
+the [zxcvbn](https://github.com/dropbox/zxcvbn) password strength
+estimation algorithm as it appears in the 2016 USENIX
+Security [paper and presentation](https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/wheeler)
+(with some small modifications).
+
 -}
-module Text.Password.Strength
-  ( score
-  , Search.Score(..)
-  , strength
-  , Strength(..)
-  , Config
-  , en_US
+module Text.Password.Strength (
+  -- * Estimating Guesses
+  score,
+  Search.Score(..),
+
+  -- * Calculating Password Strength
+  strength,
+  Strength(..),
+
+  -- * Default Configuration
+  en_US
+
   ) where
 
 --------------------------------------------------------------------------------
@@ -34,33 +45,40 @@ import Text.Password.Strength.Internal.Config
 import qualified Text.Password.Strength.Internal.Search as Search
 
 --------------------------------------------------------------------------------
-score :: Config -> Day -> Text -> Search.Score
+-- | Estimate the number of guesses an attacker would need to make to
+-- crack the given password.
+score :: Config -- ^ Which dictionaries, keyboards, etc. to use.
+      -> Day    -- ^ Reference day for date matches (should be current day).
+      -> Text   -- ^ The password to score.
+      -> Search.Score -- ^ Estimate.
 score c d p = Search.score (Search.graph c d p)
 
 --------------------------------------------------------------------------------
+-- | Measurement of password strength.
 data Strength
   = Risky
-    -- ^ Too guessable: risky password. (guesses < 10^3)
+    -- ^ Too guessable: risky password. (guesses < \(10^{3}\))
 
   | Weak
     -- ^ Very guessable: protection from throttled online
-    -- attacks. (guesses < 10^6)
+    -- attacks. (guesses < \(10^{6}\))
 
   | Moderate
     -- ^ Somewhat guessable: protection from unthrottled online
-    -- attacks. (guesses < 10^8)
+    -- attacks. (guesses < \(10^{8}\))
 
   | Safe
     -- ^ Safely unguessable: moderate protection from offline
-    -- slow-hash scenario. (guesses < 10^10)
+    -- slow-hash scenario. (guesses < \(10^{10}\))
 
   | Strong
     -- ^ Very unguessable: strong protection from offline slow-hash
-    -- scenario. (guesses >= 10^10)
+    -- scenario. (guesses >= \(10^{10}\))
 
-  deriving (Show, Eq, Ord, Enum)
+  deriving (Show, Read, Eq, Ord, Enum, Bounded)
 
 --------------------------------------------------------------------------------
+-- | Calculate the strength of a password given its score.
 strength :: Search.Score -> Strength
 strength (Search.Score n)
   | n < 10 ^ ( 3 :: Int) = Risky

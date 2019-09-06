@@ -18,13 +18,14 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.L33t
-  ( L33t
-  , l33t
-  , l33tText
-  , l33tSub
-  , l33tUnsub
-  , l33t2Eng
+module Text.Password.Strength.Internal.L33t (
+  -- * L33t Speak Substitution
+  L33t,
+  l33t,
+  l33tText,
+  l33tSub,
+  l33tUnsub,
+  l33t2Eng
   ) where
 
 --------------------------------------------------------------------------------
@@ -39,6 +40,7 @@ import qualified Data.Text as Text
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
+-- | Track a translated l33t speak token.
 data L33t = L33t
   { _l33tText :: Text
     -- ^ The translated (un-l33ted) text.

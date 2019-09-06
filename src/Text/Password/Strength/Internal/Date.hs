@@ -16,12 +16,13 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Date
-  ( Date
-  , YMD
-  , isDate
-  , toYMD
-  , estimateDate
+module Text.Password.Strength.Internal.Date (
+  -- * Date Matches
+  Date,
+  YMD,
+  isDate,
+  toYMD,
+  estimateDate
   ) where
 
 --------------------------------------------------------------------------------

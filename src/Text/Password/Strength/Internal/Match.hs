@@ -17,10 +17,11 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Match
-  ( Match(..)
-  , Matches
-  , matches
+module Text.Password.Strength.Internal.Match (
+  -- * Matching Tokens Against Known Patterns
+  Match(..),
+  Matches,
+  matches
   ) where
 
 --------------------------------------------------------------------------------
@@ -46,6 +47,7 @@ import Text.Password.Strength.Internal.Sequence
 import Text.Password.Strength.Internal.Token
 
 --------------------------------------------------------------------------------
+-- | The known patterns we are searching for.
 data Match
   = DictionaryMatch Rank
     -- ^ The associated token was found in a frequency dictionary with

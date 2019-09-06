@@ -17,21 +17,19 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Config
-  ( Config
-  , HasConfig
-  , Dictionary
-  , en_US
-  , dictionaries
-  , addPasswordDict
-  , addWordFrequencyDict
-  , addCustomFrequencyList
-  , addKeyboardGraph
-  , passwordLists
-  , wordFrequencyLists
-  , customFrequencyLists
-  , keyboardGraphs
-  , obviousSequenceStart
+module Text.Password.Strength.Internal.Config (
+  -- * Configuration
+  Config,
+  HasConfig,
+  Dictionary,
+  en_US,
+  dictionaries,
+  passwordLists,
+  wordFrequencyLists,
+  customFrequencyLists,
+  keyboardGraphs,
+  obviousSequenceStart,
+  addCustomFrequencyList
   ) where
 
 --------------------------------------------------------------------------------
@@ -60,25 +58,10 @@ type Dictionary = HashMap Text Int
 -- be used when estimating guesses.
 data Config = Config
   { _passwordLists :: [Dictionary]
-    -- ^ Leaked password frequency lists.
-
   , _wordFrequencyLists :: [Dictionary]
-    -- ^ Various word frequency lists.
-
   , _customFrequencyLists :: [Dictionary]
-    -- ^ Custom word frequency lists.
-    --
-    -- Usually includes information about the person whose password we
-    -- are guessing and the application for which we are running.
-
   , _keyboardGraphs :: [AdjacencyTable]
-    -- ^ Keyboard adjacency graphs.
-
   , _obviousSequenceStart :: Char -> Bool
-    -- ^ Predicate function that should return 'True' for characters
-    -- that are "obvious first choices" to start a sequence.  For
-    -- example, in English, @a@ and @A@ would be considered 'True'.
-
   }
 
 makeClassy ''Config
@@ -126,26 +109,6 @@ dictionaries c = join [ c ^. passwordLists
                       ]
 
 --------------------------------------------------------------------------------
--- | Add a password frequency dictionary.
---
--- It's best to generate a dictionary from text data using the tools
--- provided in this package's @tools@ directory.
---
--- If manually generating the dictionary, keep in mind that the @Int@
--- value in the @HashMap@ represents the number of guesses required to
--- crack the password (which is the key of the @HashMap@).  The number of
--- guesses should be @>= 1@.
-addPasswordDict :: Dictionary -> Config -> Config
-addPasswordDict d = passwordLists %~ (d:)
-
---------------------------------------------------------------------------------
--- | Add a word frequency dictionary.
---
--- See 'addPasswordDict' for details.
-addWordFrequencyDict :: Dictionary -> Config -> Config
-addWordFrequencyDict d = wordFrequencyLists %~ (d:)
-
---------------------------------------------------------------------------------
 -- | Add a custom list of words for frequency lookup.  The words
 -- should be ordered from most frequent to least frequent.
 addCustomFrequencyList :: Vector Text -> Config -> Config
@@ -156,11 +119,3 @@ addCustomFrequencyList v = addDict (mkDict v)
 
     addDict :: Dictionary -> Config -> Config
     addDict d = customFrequencyLists %~ (d:)
-
---------------------------------------------------------------------------------
--- | Add a keyboard adjacency graph.
---
--- An adjacency graph can be created with the tools included in this
--- package.  Please see the @tools@ directory for more details.
-addKeyboardGraph :: AdjacencyTable -> Config -> Config
-addKeyboardGraph g = keyboardGraphs %~ (g:)

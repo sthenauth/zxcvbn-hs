@@ -19,23 +19,24 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Adjacency
-  ( Pattern
-  , Direction(..)
-  , Move(..)
-  , Layer(..)
-  , Adjacency(..)
-  , AdjacencyTable(..)
-  , totalChars
-  , averageNeighbors
-  , patterns
-  , findSequence
-  , AdjacencyScore(..)
-  , patternLength
-  , totalTurns
-  , primaryLayer
-  , secondaryLayer
-  , scoreSequence
+module Text.Password.Strength.Internal.Adjacency (
+  -- * Adjacency Matching (for Keyboard Patterns)
+  Pattern,
+  Direction(..),
+  Move(..),
+  Layer(..),
+  Adjacency(..),
+  AdjacencyTable(..),
+  totalChars,
+  averageNeighbors,
+  patterns,
+  findSequence,
+  AdjacencyScore(..),
+  patternLength,
+  totalTurns,
+  primaryLayer,
+  secondaryLayer,
+  scoreSequence
   ) where
 
 --------------------------------------------------------------------------------
@@ -56,14 +57,17 @@ import GHC.Generics (Generic)
 type Pattern = (Char, Char)
 
 --------------------------------------------------------------------------------
+-- | Direction of movement for adjacent characters.
 data Direction = N | NE | E | SE | S | SW | W | NW
   deriving (Generic, Binary, Show, Eq, Ord, Enum, Bounded)
 
 --------------------------------------------------------------------------------
+-- | Movement between characters.
 data Move = Move Direction | Stay
   deriving (Generic, Binary, Show, Eq)
 
 --------------------------------------------------------------------------------
+-- | Keyboard layers.
 data Layer = Primary | Secondary
   deriving (Generic, Binary, Show, Eq, Ord, Enum, Bounded)
 

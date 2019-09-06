@@ -14,10 +14,11 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Sequence
-  ( Delta
-  , isSequence
-  , estimateSequence
+module Text.Password.Strength.Internal.Sequence (
+  -- * Sequence Matches
+  Delta,
+  isSequence,
+  estimateSequence
   ) where
 
 --------------------------------------------------------------------------------

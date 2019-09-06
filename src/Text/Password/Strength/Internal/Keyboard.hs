@@ -16,11 +16,12 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Keyboard
-  ( KeyboardPattern
-  , keyboardToken
-  , keyboardPattern
-  , keyboardEstimate
+module Text.Password.Strength.Internal.Keyboard (
+  -- * Keyboard Pattern Matching
+  KeyboardPattern,
+  keyboardToken,
+  keyboardPattern,
+  keyboardEstimate
   ) where
 
 --------------------------------------------------------------------------------
@@ -36,6 +37,7 @@ import Text.Password.Strength.Internal.Token
 import Text.Password.Strength.Internal.Math (variations')
 
 --------------------------------------------------------------------------------
+-- | Information about a found pattern.
 newtype KeyboardPattern =
   KeyboardPattern (Int, Int, Token, AdjacencyScore)
   deriving (Show)

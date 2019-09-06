@@ -13,32 +13,33 @@ Copyright:
 
 License: MIT
 
+These internals details are subject to change.  Use at your own risk.
+
 -}
 module Text.Password.Strength.Internal
-  ( module Text.Password.Strength.Internal.Match
-  , module Text.Password.Strength.Internal.Token
-  , module Text.Password.Strength.Internal.Dictionary
-  , module Text.Password.Strength.Internal.L33t
+  ( module Text.Password.Strength.Internal.Token
+  , module Text.Password.Strength.Internal.Match
   , module Text.Password.Strength.Internal.Estimate
   , module Text.Password.Strength.Internal.Search
-  , module Text.Password.Strength.Internal.Config
+  , module Text.Password.Strength.Internal.Dictionary
+  , module Text.Password.Strength.Internal.L33t
   , module Text.Password.Strength.Internal.Adjacency
   , module Text.Password.Strength.Internal.Keyboard
-  , module Text.Password.Strength.Internal.Repeat
   , module Text.Password.Strength.Internal.Sequence
   , module Text.Password.Strength.Internal.Date
+  , module Text.Password.Strength.Internal.Repeat
+  , module Text.Password.Strength.Internal.Config
   ) where
 
-
-import Text.Password.Strength.Internal.Match
-import Text.Password.Strength.Internal.Token
-import Text.Password.Strength.Internal.Dictionary
-import Text.Password.Strength.Internal.L33t
-import Text.Password.Strength.Internal.Estimate
-import Text.Password.Strength.Internal.Search
-import Text.Password.Strength.Internal.Config
 import Text.Password.Strength.Internal.Adjacency
-import Text.Password.Strength.Internal.Keyboard
-import Text.Password.Strength.Internal.Repeat
-import Text.Password.Strength.Internal.Sequence
+import Text.Password.Strength.Internal.Config
 import Text.Password.Strength.Internal.Date
+import Text.Password.Strength.Internal.Dictionary
+import Text.Password.Strength.Internal.Estimate
+import Text.Password.Strength.Internal.Keyboard
+import Text.Password.Strength.Internal.L33t
+import Text.Password.Strength.Internal.Match
+import Text.Password.Strength.Internal.Repeat
+import Text.Password.Strength.Internal.Search
+import Text.Password.Strength.Internal.Sequence
+import Text.Password.Strength.Internal.Token

@@ -14,10 +14,11 @@ Copyright:
 License: MIT
 
 -}
-module Text.Password.Strength.Internal.Dictionary
-  ( Dictionary
-  , Rank
-  , rank
+module Text.Password.Strength.Internal.Dictionary (
+  -- * Frequency Dictionary Matching
+  Dictionary,
+  Rank,
+  rank
   ) where
 
 --------------------------------------------------------------------------------
