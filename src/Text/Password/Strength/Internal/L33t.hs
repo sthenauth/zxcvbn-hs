@@ -9,7 +9,7 @@ Copyright:
   license terms in the LICENSE file found in the top-level directory
   of this distribution and at:
 
-    https://code.devalot.com/open/zxcvbn-hs
+    https://code.devalot.com/sthenauth/zxcvbn-hs
 
   No part of this package, including this file, may be copied,
   modified, propagated, or distributed except according to the terms
