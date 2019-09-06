@@ -1,0 +1,55 @@
+Build profile: -w ghc-8.6.4 -O2
+In order, the following will be built (use -v for more details):
+ - zxcvbn-hs-0.1.0.0 (bench:bench) (first run)
+Preprocessing benchmark 'bench' for zxcvbn-hs-0.1.0.0..
+Building benchmark 'bench' for zxcvbn-hs-0.1.0.0..
+Running 1 benchmarks...
+Benchmark bench: RUNNING...
+benchmarking password
+time                 46.23 μs   (46.16 μs .. 46.30 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 46.24 μs   (46.20 μs .. 46.29 μs)
+std dev              152.7 ns   (126.2 ns .. 187.3 ns)
+
+benchmarking password1999
+time                 190.2 μs   (188.8 μs .. 192.2 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 189.8 μs   (189.3 μs .. 191.1 μs)
+std dev              2.603 μs   (1.287 μs .. 4.661 μs)
+
+benchmarking passwordpasswordp@ssw0rd
+time                 917.1 μs   (903.7 μs .. 934.1 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 916.2 μs   (906.4 μs .. 927.6 μs)
+std dev              36.15 μs   (30.03 μs .. 44.64 μs)
+variance introduced by outliers: 29% (moderately inflated)
+
+benchmarking passwordasdftasdft
+time                 340.5 μs   (340.0 μs .. 341.1 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 342.2 μs   (340.2 μs .. 349.7 μs)
+std dev              11.86 μs   (1.592 μs .. 24.48 μs)
+variance introduced by outliers: 29% (moderately inflated)
+
+benchmarking YohMei9eeb6Ahrohrahk
+time                 507.8 μs   (503.5 μs .. 513.2 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 508.6 μs   (505.4 μs .. 514.1 μs)
+std dev              13.86 μs   (8.209 μs .. 22.19 μs)
+variance introduced by outliers: 19% (moderately inflated)
+
+benchmarking P!@'XrC4b%-#Ldcd9aqJ+`;'VfjnWe
+time                 1.551 ms   (1.533 ms .. 1.573 ms)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 1.554 ms   (1.535 ms .. 1.573 ms)
+std dev              64.09 μs   (50.21 μs .. 81.37 μs)
+variance introduced by outliers: 28% (moderately inflated)
+
+benchmarking #]HtCNk#`#@)n1Kq!m/i9@phtg)|Re'wNuy@}F^s|9ip$/v-*fFg:p<X9.
+time                 14.54 ms   (14.31 ms .. 14.83 ms)
+                     0.998 R²   (0.995 R² .. 0.999 R²)
+mean                 14.48 ms   (14.29 ms .. 14.66 ms)
+std dev              461.9 μs   (366.0 μs .. 606.9 μs)
+variance introduced by outliers: 11% (moderately inflated)
+
+Benchmark bench: FINISH
