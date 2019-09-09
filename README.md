@@ -65,6 +65,12 @@ main = do
   print (strength guesses) -- Sum type describing the password strength (Risky)
 ```
 
+Demo App
+--------
+
+If you want to play with an interactive demo take a look at the
+[zxcvbn-ws repository][zxcvbn-ws].
+
 Customization
 -------------
 
@@ -95,6 +101,14 @@ Included in the default configuration are:
 
   * Number pad keyboard layout
 
+You probably want to supply extra words for the frequency lists.  For
+example: the name of your application and any personal details you
+have about the person entering the password.  That way you penalize
+them for using those details in their password.
+
+The `addCustomFrequencyList` function can be used to add words to the
+`Config` value.
+
 Performance
 -----------
 
@@ -110,6 +124,7 @@ Most of the time is currently spent in decoding and testing l33t
 speak.  If you want to work on improving the performance I suggestion
 you generate a profile using the benchmark tool.
 
+[zxcvbn-ws]: https://code.devalot.com/sthenauth/zxcvbn-ws
 [zxcvbn]: https://github.com/dropbox/zxcvbn
 [paper]: https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/wheeler
 [Mark Burnett]: https://xato.net/today-i-am-releasing-ten-million-passwords-b6278bbe7495?gi=d98e0d16566b
