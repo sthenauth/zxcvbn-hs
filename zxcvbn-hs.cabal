@@ -10,17 +10,24 @@ license-file:  LICENSE
 author:        Peter Jones <pjones@devalot.com>
 maintainer:    Peter Jones <pjones@devalot.com>
 copyright:     Copyright (c) 2019 Peter Jones
+homepage:      https://code.devalot.com/sthenauth/zxcvbn-hs
+bug-reports:   https://github.com/sthenauth/zxcvbn-hs/issues
 category:      System
 
 --------------------------------------------------------------------------------
 extra-source-files:
   CHANGELOG.md
 
+--------------------------------------------------------------------------------
 flag tools
   description: Build the data processing tools (i.e. dictionary compilers)
-  -- FIXME: Set this to False before first release
-  default: True
+  default: False
   manual: True
+
+--------------------------------------------------------------------------------
+source-repository head
+  type: git
+  location: https://code.devalot.com/sthenauth/zxcvbn-hs.git
 
 --------------------------------------------------------------------------------
 common options
