@@ -29,6 +29,7 @@ mkDerivation {
     criterion fgl lens math-functions text time unordered-containers
     vector zlib
   ];
+  homepage = "https://code.devalot.com/sthenauth/zxcvbn-hs";
   description = "Password strength estimation based on zxcvbn";
   license = stdenv.lib.licenses.mit;
 }
