@@ -23,14 +23,9 @@ module Text.Password.Strength.Internal.Sequence (
 
 --------------------------------------------------------------------------------
 -- Library Imports:
-import Control.Lens ((^.))
 import Data.Char (ord, isDigit)
 import Data.Text (Text)
 import qualified Data.Text as Text
-
---------------------------------------------------------------------------------
--- Project Imports:
-import Text.Password.Strength.Internal.Config
 
 --------------------------------------------------------------------------------
 -- | Type alias to represent the distance between characters.
@@ -60,13 +55,13 @@ isSequence t =
 -- implementations which don't even use the calculated delta.  The
 -- only change from the paper is to compensated for a delta of 0,
 -- which isn't accounted for in the paper.
-estimateSequence :: Config -> Text -> Delta -> Integer
-estimateSequence c t d =
+estimateSequence :: (Char -> Bool) -> Text -> Delta -> Integer
+estimateSequence f t d =
   let len    = toInteger $ Text.length t
       start  = if len > 0 then Text.head t else '\0'
       delta  = toInteger (if d == 0 then 1 else abs d)
       base   = case () of
-                 () | (c ^. obviousSequenceStart) start -> 4
-                    | isDigit start                       -> 10
-                    | otherwise                           -> 26
+                 () | f start       -> 4
+                    | isDigit start -> 10
+                    | otherwise     -> 26
   in base * len * delta

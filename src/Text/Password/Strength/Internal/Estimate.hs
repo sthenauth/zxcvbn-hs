@@ -94,7 +94,8 @@ estimate cfg token match es =
       keyboardEstimate k
 
     SequenceMatch delta ->
-      estimateSequence cfg (token ^. tokenChars) delta
+      let f = (cfg ^. obviousSequenceStart)
+      in estimateSequence f (token ^. tokenChars) delta
 
     DateMatch d ->
       estimateDate d
