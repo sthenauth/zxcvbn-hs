@@ -14,11 +14,11 @@ data=$(realpath data)
 src=$(realpath src/Text/Password/Strength/Generated)
 
 echo "==> Build"
-nix-hs build
+nix-hs build -ftools
 
 echo "==> Adjacency.hs"
 nix-hs \
-  run zxcvbn-tools -- adjacency \
+  run -ftools zxcvbn-tools -- adjacency \
   "$data/keyboards/en-US/qwerty.txt" \
   "$data/keyboards/en-US/numpad.txt" \
   > "$src/Adjacency.hs.new"
@@ -27,7 +27,7 @@ mv "$src/Adjacency.hs.new" "$src/Adjacency.hs"
 
 echo "==> Frequency.hs"
 nix-hs \
-  run zxcvbn-tools -- frequency \
+  run -ftools zxcvbn-tools -- frequency \
   "$data/passwords/xato.txt:30000"                       \
   "$data/dictionaries/en-US/us_tv_and_film.txt:30000"    \
   "$data/dictionaries/en-US/english_wikipedia.txt:30000" \

@@ -10,7 +10,7 @@ import qualified Codec.Compression.GZip as GZip
 import qualified Data.ByteString.Base64.Lazy as Base64
 import qualified Data.Binary as Binary
 import Data.Binary.Orphans ()
-import Text.Password.Strength.Internal.Adjacency
+import Text.Password.Strength.Types
 
 qwerty :: AdjacencyTable
 qwerty =

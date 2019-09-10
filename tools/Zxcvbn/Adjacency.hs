@@ -205,7 +205,7 @@ adjTable k = AdjacencyTable chars avns table
 run :: Global -> IO ()
 run Global{..} = do
   putStr (header $ fromMaybe "Text.Password.Strength.Generated.Adjacency" mname)
-  putStr "import Text.Password.Strength.Internal.Adjacency\n\n"
+  putStr "import Text.Password.Strength.Types\n\n"
 
   forM_ files $ \file -> do
     k@Keyboard{..} <- keyboard' file
