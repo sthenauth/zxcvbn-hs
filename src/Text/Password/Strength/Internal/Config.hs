@@ -73,7 +73,21 @@ instance Semigroup Config where
         & wordFrequencyLists   %~ (++ (y ^. wordFrequencyLists))
         & customFrequencyLists %~ (++ (y ^. customFrequencyLists))
         & keyboardGraphs       %~ (++ (y ^. keyboardGraphs))
-        & obviousSequenceStart .~     (y ^. obviousSequenceStart)
+        & obviousSequenceStart .~ oss
+      where
+        -- Laws:
+        --
+        -- >>> x <> y
+        --
+        -- * Left identity:  (\c -> const False c || y c) == y c
+        -- * Right identity: (\c -> x c || const False c) == x c
+        --
+        -- * Associativity:
+        --
+        --   (\c -> (x c || y c) || z c) == (\c -> (x c || (y c || z c)))
+        oss :: Char -> Bool
+        oss c = (x ^. obviousSequenceStart) c
+             || (y ^. obviousSequenceStart) c
 
 --------------------------------------------------------------------------------
 instance Monoid Config where
