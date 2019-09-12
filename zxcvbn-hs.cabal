@@ -17,6 +17,7 @@ category:      System
 --------------------------------------------------------------------------------
 extra-source-files:
   CHANGELOG.md
+  README.md
 
 --------------------------------------------------------------------------------
 flag tools
@@ -69,7 +70,7 @@ common tool-dependencies
 --------------------------------------------------------------------------------
 library
   import: options, dependencies
-  ghc-prof-options: -fprof-auto -fprof-cafs
+  -- ghc-prof-options: -fprof-auto -fprof-cafs
   hs-source-dirs: src
 
   exposed-modules:

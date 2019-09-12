@@ -8,6 +8,7 @@ let
   };
 
   nix-hs = (import "${nix-hs-src}/default.nix" {inherit pkgs;});
+  zxcvbn-hs = import ./default.nix {inherit pkgs;};
 
 in
 
@@ -17,5 +18,10 @@ pkgs.mkShell {
     haskellPackages.hlint
     haskellPackages.hasktags
     # cabal-dependency-licenses
+
+    (haskellPackages.ghcWithPackages (hs: [
+      zxcvbn-hs
+      hs.cabal-install
+    ]))
   ];
 }
