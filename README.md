@@ -74,6 +74,17 @@ If you want to play with an interactive demo take a look at the
 Customization
 -------------
 
+You'll most likely want to add custom words to the frequency
+dictionaries.  For example, the name of your application, your domain
+name, and any personal information you have on the customer.  Doing so
+will penalize the score of a password using such information.
+
+The `Text.Password.Strength.Config` module defines the
+`addCustomFrequencyList` function which can be used to easily add
+words to the frequency dictionary.
+
+### Localization ###
+
 Unlike other implementations of the [zxcvbn][] algorithm, this version
 fully supports localization.  It's easy to augment or completely
 replace the frequency dictionaries and keyboard layouts.  Tools are
@@ -101,13 +112,9 @@ Included in the default configuration are:
 
   * Number pad keyboard layout
 
-You probably want to supply extra words for the frequency lists.  For
-example: the name of your application and any personal details you
-have about the person entering the password.  That way you penalize
-them for using those details in their password.
+### Existing Localization Packages ###
 
-The `addCustomFrequencyList` function can be used to add words to the
-`Config` value.
+  * [zxcvbn-dvorak][] Dvorak keyboard layout
 
 Performance
 -----------
@@ -124,7 +131,8 @@ Most of the time is currently spent in decoding and testing l33t
 speak.  If you want to work on improving the performance I suggestion
 you generate a profile using the benchmark tool.
 
+[Mark Burnett]: https://xato.net/today-i-am-releasing-ten-million-passwords-b6278bbe7495?gi=d98e0d16566b
+[paper]: https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/wheeler
+[zxcvbn-dvorak]:https://code.devalot.com/sthenauth/zxcvbn-dvorak
 [zxcvbn-ws]: https://code.devalot.com/sthenauth/zxcvbn-ws
 [zxcvbn]: https://github.com/dropbox/zxcvbn
-[paper]: https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/wheeler
-[Mark Burnett]: https://xato.net/today-i-am-releasing-ten-million-passwords-b6278bbe7495?gi=d98e0d16566b
