@@ -22,7 +22,7 @@ module Zxcvbn.Encode
 --------------------------------------------------------------------------------
 -- Imports:
 import Data.Binary (Binary)
-import Data.Binary.Orphans ()
+import Data.Binary.Instances ()
 import qualified Codec.Compression.GZip as GZip
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Base64.Lazy as Base64
@@ -47,7 +47,7 @@ header m =
           , "import qualified Codec.Compression.GZip as GZip\n"
           , "import qualified Data.ByteString.Base64.Lazy as Base64\n"
           , "import qualified Data.Binary as Binary\n"
-          , "import Data.Binary.Orphans ()\n"
+          , "import Data.Binary.Instances ()\n"
           ]
 
 --------------------------------------------------------------------------------

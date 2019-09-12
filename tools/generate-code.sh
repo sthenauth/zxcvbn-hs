@@ -1,5 +1,5 @@
 #! /usr/bin/env nix-shell
-#! nix-shell -i bash ../shell.nix
+#! nix-shell -i bash
 # shellcheck shell=bash
 
 set -e
@@ -13,12 +13,8 @@ fi
 data=$(realpath data)
 src=$(realpath src/Text/Password/Strength/Generated)
 
-echo "==> Build"
-nix-hs build -ftools
-
 echo "==> Adjacency.hs"
-nix-hs \
-  run -ftools zxcvbn-tools -- adjacency \
+zxcvbn-tools adjacency \
   "$data/keyboards/en-US/qwerty.txt" \
   "$data/keyboards/en-US/numpad.txt" \
   > "$src/Adjacency.hs.new"
@@ -26,8 +22,7 @@ nix-hs \
 mv "$src/Adjacency.hs.new" "$src/Adjacency.hs"
 
 echo "==> Frequency.hs"
-nix-hs \
-  run -ftools zxcvbn-tools -- frequency \
+zxcvbn-tools frequency \
   "$data/passwords/xato.txt:30000"                       \
   "$data/dictionaries/en-US/us_tv_and_film.txt:30000"    \
   "$data/dictionaries/en-US/english_wikipedia.txt:30000" \

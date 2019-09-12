@@ -1,9 +1,4 @@
 Build profile: -w ghc-8.6.4 -O2
-In order, the following will be built (use -v for more details):
- - zxcvbn-hs-0.1.0.0 (bench:bench) (first run)
-Preprocessing benchmark 'bench' for zxcvbn-hs-0.1.0.0..
-Building benchmark 'bench' for zxcvbn-hs-0.1.0.0..
-Running 1 benchmarks...
 Benchmark bench: RUNNING...
 benchmarking password
 time                 46.23 μs   (46.16 μs .. 46.30 μs)

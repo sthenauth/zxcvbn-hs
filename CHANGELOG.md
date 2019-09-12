@@ -1,5 +1,16 @@
-# Revision history for zxcvbn-hs
+Revision History for zxcvbn-hs
+==============================
 
-## 0.1.0.0 -- YYYY-mm-dd
+0.2.0.0 (September 12, 2019)
+----------------------------
 
-* First version. Released on an unsuspecting world.
+  * Make it possible for external projects to use the code generation
+    tool (`zxcvbn-tools`)
+
+  * Due to the `binary-orphans -> binary-instances` rename this
+    package now only compiles under `nixpkgs-unstable`.
+
+0.1.0.0 (September 10, 2019)
+----------------------------
+
+  * Initial (unreleased) version

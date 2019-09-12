@@ -9,7 +9,7 @@ import Data.Text (Text)
 import qualified Codec.Compression.GZip as GZip
 import qualified Data.ByteString.Base64.Lazy as Base64
 import qualified Data.Binary as Binary
-import Data.Binary.Orphans ()
+import Data.Binary.Instances ()
 import Text.Password.Strength.Internal.Adjacency
 
 female_names :: HashMap Text Int
