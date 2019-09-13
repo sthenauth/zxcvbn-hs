@@ -4,7 +4,7 @@
 let
   nix-hs-src = fetchGit {
     url = "https://code.devalot.com/open/nix-hs.git";
-    rev = "d6d0dcb0b591253f0d69ed52103fcea7d6992a24";
+    rev = "2003332a1e8e518b54e6143f9a9467a8a05abca4";
   };
 
   nix-hs = import "${nix-hs-src}/default.nix" { inherit pkgs; };

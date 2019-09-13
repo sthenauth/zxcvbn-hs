@@ -6,6 +6,6 @@ let
 
 in pkgs.mkShell {
   buildInputs = with pkgs; [
-    zxcvbn-hs.bin
+    zxcvbn-hs
   ];
 }
