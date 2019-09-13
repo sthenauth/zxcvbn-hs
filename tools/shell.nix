@@ -2,13 +2,10 @@
 }:
 
 let
-  drv = import ../default.nix { inherit pkgs; };
-
-  zxcvbn-hs = pkgs.haskell.lib.overrideCabal drv
-    (_: {configureFlags = [ "-ftools" ];});
+  zxcvbn-hs = import ../default.nix { inherit pkgs; };
 
 in pkgs.mkShell {
   buildInputs = with pkgs; [
-    zxcvbn-hs
+    zxcvbn-hs.bin
   ];
 }

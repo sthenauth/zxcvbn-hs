@@ -1,17 +1,13 @@
 #! /usr/bin/env nix-shell
-#! nix-shell -i bash
+#! nix-shell -i bash shell.nix
 # shellcheck shell=bash
 
 set -e
 set -u
 
-if [ ! -d tools ]; then
-  >&2 echo "ERROR: please run from the top-level directory"
-  exit 1
-fi
-
-data=$(realpath data)
-src=$(realpath src/Text/Password/Strength/Generated)
+top=$(realpath "$(dirname "$0")/..")
+data=$(realpath "$top/data")
+src=$(realpath "$top/src/Text/Password/Strength/Generated")
 
 echo "==> Adjacency.hs"
 zxcvbn-tools adjacency \
