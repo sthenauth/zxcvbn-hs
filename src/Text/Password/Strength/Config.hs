@@ -39,12 +39,7 @@ module Text.Password.Strength.Config (
   --     start a sequence.  For example, in English, @a@ and @A@ would
   --     be considered 'True'.
   --
-  passwordLists,
-  wordFrequencyLists,
-  customFrequencyLists,
-  keyboardGraphs,
-  obviousSequenceStart,
-  HasConfig
+  HasConfig(..)
   ) where
 
 import Text.Password.Strength.Internal.Config

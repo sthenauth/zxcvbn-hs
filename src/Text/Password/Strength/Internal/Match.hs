@@ -92,7 +92,7 @@ type Matches = Map Token [Match]
 --------------------------------------------------------------------------------
 -- | All possible matches after various transformations.
 matches :: Config -> Day -> Text -> Matches
-matches config day =
+matches cfg day =
     repeats .
       foldr (\t -> Map.insert t (check t)) Map.empty .
         allTokens
@@ -104,12 +104,12 @@ matches config day =
 
     -- Tokens that appear in a dictionary.
     dict :: Token -> Maybe Match
-    dict t = DictionaryMatch <$> rank config (^. tokenLower) t
+    dict t = DictionaryMatch <$> rank cfg (^. tokenLower) t
 
     -- Tokens that, when reversed, appear in a dictionary.
     rdict :: Token -> Maybe Match
     rdict t = ReverseDictionaryMatch <$>
-                rank config (views tokenLower Text.reverse) t
+                rank cfg (views tokenLower Text.reverse) t
 
     -- Tokens that, when decoded, appear in a dictionary.
     --
@@ -119,7 +119,7 @@ matches config day =
     l33ts :: Token -> Maybe Match
     l33ts t =
       let ts = l33t t -- Decoding may result in multiple outputs.
-          rnk l = (,l) <$> rank config (^. l33tText) l
+          rnk l = (,l) <$> rank cfg (^. l33tText) l
       in uncurry L33tMatch <$>
            minimumByOf traverse (compare `on` (^. _1))
                                 (mapMaybe rnk ts)
@@ -128,7 +128,7 @@ matches config day =
     kbd :: Token -> [Match]
     kbd t = KeyboardMatch <$>
               mapMaybe (`keyboardPattern` t)
-                (config ^. keyboardGraphs)
+                (cfg ^. keyboardGraphs)
 
     -- Characters in a token form a sequence.
     seqMatch :: Token -> Maybe Match

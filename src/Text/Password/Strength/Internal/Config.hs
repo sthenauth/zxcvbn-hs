@@ -20,15 +20,10 @@ License: MIT
 module Text.Password.Strength.Internal.Config (
   -- * Configuration
   Config,
-  HasConfig,
+  HasConfig(..),
   Dictionary,
   en_US,
   dictionaries,
-  passwordLists,
-  wordFrequencyLists,
-  customFrequencyLists,
-  keyboardGraphs,
-  obviousSequenceStart,
   addCustomFrequencyList
   ) where
 

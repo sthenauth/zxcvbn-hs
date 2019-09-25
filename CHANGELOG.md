@@ -1,6 +1,12 @@
 Revision History for zxcvbn-hs
 ==============================
 
+0.2.1.0 (September 25, 2019)
+----------------------------
+
+  * Export the entire `HasConfig` class so external code can use the
+    `config` lens.
+
 0.2.0.0 (September 12, 2019)
 ----------------------------
 
