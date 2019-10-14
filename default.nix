@@ -15,5 +15,10 @@ in nix-hs {
 
   overrides = lib: self: super: with lib; {
     pipes-text = unBreak (dontCheck (doJailbreak super.pipes-text));
+
+    optparse-applicative =
+      if super ? optparse-applicative_0_15_0_0
+        then super.optparse-applicative_0_15_0_0
+        else optparse-applicative;
   };
 }
