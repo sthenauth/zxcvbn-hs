@@ -20,5 +20,10 @@ in nix-hs {
       if super ? optparse-applicative_0_15_0_0
         then super.optparse-applicative_0_15_0_0
         else optparse-applicative;
+
+    lens =
+      if super ? lens_4_18
+        then super.lens_4_18
+        else super.lens;
   };
 }
