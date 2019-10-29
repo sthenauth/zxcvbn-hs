@@ -24,7 +24,6 @@ module Text.Password.Strength.Internal.Search (
   edges,
   bfEdges,
   graph,
-  Score(..),
   score,
   shortestPath
   ) where
@@ -114,7 +113,7 @@ bfEdges p es = mapMaybe (fmap guesses . check) rows
 -- list.  In the guessing graph the nodes are the characters in the
 -- password and the edges are the estimated guesses.
 graph :: Config -> Day -> Text -> Graph
-graph config day password =
+graph cfg day password =
     Graph exit edges' (Graph.mkGraph nodes (flatten edges'))
   where
     exit :: Int
@@ -125,23 +124,17 @@ graph config day password =
 
     edges' :: Map (Int, Int) Integer
     edges' =
-      let es = edges config day password
+      let es = edges cfg day password
       in es `Map.union` Map.fromList (bfEdges password es)
 
     flatten :: Map (Int, Int) Integer -> [(Int, Int, Integer)]
     flatten = map (\((x, y), z) -> (x, y, z)) . Map.assocs
 
 --------------------------------------------------------------------------------
--- | A score is an estimate of the number of guesses it would take to
--- crack a password.
-newtype Score = Score { getScore :: Integer }
-  deriving (Show, Eq, Ord)
-
---------------------------------------------------------------------------------
 -- | Collapse a graph down to a single score which represents the
 -- estimated number of guesses it would take to crack the password.
-score :: Graph -> Score
-score g@Graph{..} = Score $
+score :: Graph -> Integer
+score g@Graph{..} =
   case shortestPath g of
     Nothing   -> worstCase
     Just path -> maybe worstCase product (scores (nodes path))

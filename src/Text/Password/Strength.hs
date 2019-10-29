@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 {-|
 
 Copyright:
@@ -23,7 +25,7 @@ Security [paper and presentation](https://www.usenix.org/conference/usenixsecuri
 module Text.Password.Strength (
   -- * Estimating Guesses
   score,
-  Search.Score(..),
+  Score(..),
 
   -- * Calculating Password Strength
   strength,
@@ -38,6 +40,8 @@ module Text.Password.Strength (
 -- Library Imports:
 import Data.Text (Text)
 import Data.Time.Calendar (Day)
+import Data.Aeson (ToJSON(..), (.=))
+import qualified Data.Aeson as Aeson
 
 --------------------------------------------------------------------------------
 -- Project Imports:
@@ -45,13 +49,25 @@ import Text.Password.Strength.Internal.Config
 import qualified Text.Password.Strength.Internal.Search as Search
 
 --------------------------------------------------------------------------------
+-- | A score is an estimate of the number of guesses it would take to
+-- crack a password.
+newtype Score = Score { getScore :: Integer }
+  deriving (Show, Eq, Ord)
+
+instance ToJSON Score where
+  toJSON s = Aeson.object
+    [ "score"    .= getScore s
+    , "strength" .= show (strength s)
+    ]
+
+--------------------------------------------------------------------------------
 -- | Estimate the number of guesses an attacker would need to make to
 -- crack the given password.
 score :: Config -- ^ Which dictionaries, keyboards, etc. to use.
       -> Day    -- ^ Reference day for date matches (should be current day).
       -> Text   -- ^ The password to score.
-      -> Search.Score -- ^ Estimate.
-score c d p = Search.score (Search.graph c d p)
+      -> Score  -- ^ Estimate.
+score c d p = Score $ Search.score (Search.graph c d p)
 
 --------------------------------------------------------------------------------
 -- | Measurement of password strength.
@@ -79,8 +95,8 @@ data Strength
 
 --------------------------------------------------------------------------------
 -- | Calculate the strength of a password given its score.
-strength :: Search.Score -> Strength
-strength (Search.Score n)
+strength :: Score -> Strength
+strength (Score n)
   | n < 10 ^ ( 3 :: Int) = Risky
   | n < 10 ^ ( 6 :: Int) = Weak
   | n < 10 ^ ( 8 :: Int) = Moderate
