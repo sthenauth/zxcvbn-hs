@@ -1,11 +1,10 @@
 Revision History for zxcvbn-hs
 ==============================
 
-?.?.?.? (?)
+0.3.0.0 (?)
 ----------------------------
 
   * Added a `ToJSON` instance to the `Score` type.
-
 
 0.2.1.0 (September 25, 2019)
 ----------------------------
