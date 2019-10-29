@@ -1,4 +1,5 @@
 { pkgs ? import <nixpkgs> { }
+, useLatestPackages ? false
 }:
 
 let
@@ -17,12 +18,12 @@ in nix-hs {
     pipes-text = unBreak (dontCheck (doJailbreak super.pipes-text));
 
     optparse-applicative =
-      if super ? optparse-applicative_0_15_0_0
+      if useLatestPackages && super ? optparse-applicative_0_15_0_0
         then super.optparse-applicative_0_15_0_0
-        else optparse-applicative;
+        else super.optparse-applicative;
 
     lens =
-      if super ? lens_4_18
+      if useLatestPackages && super ? lens_4_18
         then super.lens_4_18
         else super.lens;
   };
