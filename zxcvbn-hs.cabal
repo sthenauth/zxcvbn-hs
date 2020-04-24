@@ -13,6 +13,7 @@ copyright:     Copyright (c) 2019 Peter Jones
 homepage:      https://code.devalot.com/sthenauth/zxcvbn-hs
 bug-reports:   https://github.com/sthenauth/zxcvbn-hs/issues
 category:      System
+tested-with:   GHC == 8.6.5, GHC == 8.8.3
 
 --------------------------------------------------------------------------------
 extra-source-files:
