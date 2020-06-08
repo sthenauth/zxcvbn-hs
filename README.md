@@ -1,13 +1,17 @@
-What?
------
+# Password Strength Estimation
+
+[![Test](https://github.com/sthenauth/zxcvbn-hs/workflows/test/badge.svg)](https://github.com/sthenauth/zxcvbn-hs/actions)
+[![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/sthenauth/zxcvbn-hs?label=release)](https://github.com/pjones/nix-hs/releases)
+[![Hackage](https://img.shields.io/hackage/v/zxcvbn-hs)](https://hackage.haskell.org/package/zxcvbn-hs)
+
+## What?
 
 This is a native Haskell implementation of the [zxcvbn][] password
 strength estimation algorithm as it appears in the 2016 USENIX
 Security [paper and presentation][paper] (with some small
 modifications).
 
-Why?
-----
+## Why?
 
 The [zxcvbn][] algorithm is a major improvement over traditional
 password strength estimators.  Instead of counting the occurrence of
@@ -15,8 +19,7 @@ special characters, mixed case characters, numeric digits, etc.,
 zxcvbn analyzes a plain text password and estimates the number of
 guesses that an attacker would need to make in order to crack it.
 
-How?
-----
+## How?
 
 A plain text password is broken into a list of substrings called
 tokens and each token is analyzed as follows:
@@ -43,8 +46,7 @@ Each possible interpretation of a token is given an estimated number
 of guesses and then the entire password is scored based on the weakest
 path.
 
-Usage
------
+## Usage
 
 A complete example can be found in the
 [example/Main.hs](example/Main.hs) file.  That said, it's pretty easy
@@ -65,14 +67,12 @@ main = do
   print (strength guesses) -- Sum type describing the password strength (Risky)
 ```
 
-Demo App
---------
+## Demo App
 
 If you want to play with an interactive demo take a look at the
 [zxcvbn-ws repository][zxcvbn-ws].
 
-Customization
--------------
+## Customization
 
 You'll most likely want to add custom words to the frequency
 dictionaries.  For example, the name of your application, your domain
@@ -83,7 +83,7 @@ The `Text.Password.Strength.Config` module defines the
 `addCustomFrequencyList` function which can be used to easily add
 words to the frequency dictionary.
 
-### Localization ###
+### Localization
 
 Unlike other implementations of the [zxcvbn][] algorithm, this version
 fully supports localization.  It's easy to augment or completely
@@ -112,12 +112,11 @@ Included in the default configuration are:
 
   * Number pad keyboard layout
 
-### Existing Localization Packages ###
+### Existing Localization Packages
 
   * [zxcvbn-dvorak][] Dvorak keyboard layout
 
-Performance
------------
+## Performance
 
 It takes approximately 1.5 ms to process a 30-character password.
 Performance degrades as the length of the password increases (e.g., a

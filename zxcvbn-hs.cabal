@@ -49,7 +49,7 @@ common dependencies
                , attoparsec                  >= 0.13  && < 0.14
                , base64-bytestring           >= 1.0   && < 1.1
                , binary                      >= 0.8   && < 0.11
-               , binary-instances            >= 0.1   && < 1.0
+               , binary-instances            >= 1.0   && < 1.1
                , containers                  >= 0.6   && < 0.7
                , fgl                         >= 5.7   && < 5.8
                , lens                        >= 4.17  && < 5
