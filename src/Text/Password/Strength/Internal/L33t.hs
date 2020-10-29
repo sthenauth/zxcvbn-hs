@@ -67,7 +67,7 @@ l33t token
     hasSubs L33t{..} = _l33tSub > 0 || _l33tUnsub > 0
 
     chars :: Text
-    chars = (token ^. tokenLower)
+    chars = token ^. tokenLower
 
     trans :: [(Token, Text)]
     trans  = case translateMap l33t2Eng chars of

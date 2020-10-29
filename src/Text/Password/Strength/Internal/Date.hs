@@ -30,8 +30,7 @@ module Text.Password.Strength.Internal.Date (
 import Control.Lens ((&), (^.), (+~), _1)
 import Control.Lens.TH (makeLenses)
 import qualified Data.Attoparsec.Text as Atto
-import Data.Char (isDigit)
-import Data.Char (isSpace)
+import Data.Char (isDigit, isSpace)
 import Data.Function (on)
 import Data.List (sortBy)
 import Data.Maybe (catMaybes, listToMaybe)
