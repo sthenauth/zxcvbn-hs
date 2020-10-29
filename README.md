@@ -1,6 +1,6 @@
 # Password Strength Estimation
 
-[![Test](https://github.com/sthenauth/zxcvbn-hs/workflows/test/badge.svg)](https://github.com/sthenauth/zxcvbn-hs/actions)
+[![CI](https://github.com/sthenauth/zxcvbn-hs/workflows/CI/badge.svg)](https://github.com/sthenauth/zxcvbn-hs/actions)
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/sthenauth/zxcvbn-hs?label=release)](https://github.com/pjones/nix-hs/releases)
 [![Hackage](https://img.shields.io/hackage/v/zxcvbn-hs)](https://hackage.haskell.org/package/zxcvbn-hs)
 
