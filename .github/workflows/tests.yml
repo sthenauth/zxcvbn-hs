@@ -31,6 +31,7 @@ jobs:
 
       - name: Configure and Freeze for Cache
         run: |
+          mv cabal.project.ci cabal.project
           cabal configure --enable-tests --enable-benchmarks --test-show-details=direct -ftools
           cabal freeze
 
