@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "haskellrc": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1653521216,
+        "narHash": "sha256-EtzD+5bziH80I0b+1h2hjxFO897CLQ82i7WBdr4jfN8=",
+        "owner": "pjones",
+        "repo": "haskellrc",
+        "rev": "058b8feb0e33a6df24e9c93d10c86cdfb1649fc0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pjones",
+        "repo": "haskellrc",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1653326962,
@@ -18,6 +38,7 @@
     },
     "root": {
       "inputs": {
+        "haskellrc": "haskellrc",
         "nixpkgs": "nixpkgs"
       }
     }
