@@ -1,6 +1,0 @@
-packages: .
-
-source-repository-package
-  type: git
-  location: https://github.com/pjones/pipes-text
-  tag: 9680232dc0662e481e503c2704954d7b6a9c86f0

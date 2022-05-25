@@ -1,0 +1,8 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:zxcvbn-hs"
+    - path: "./example"
+      component: "exe:zxcvbn-example"
+    - path: "./test"
+      component: "test:test"
