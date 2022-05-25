@@ -165,7 +165,7 @@ scoreSequence s a =
     -- both characters.
     layers :: AdjacencyScore -> AdjacencyScore
     layers = if (s ^. patternLength) == 0
-               then layer (a ^. firstLayer) . (& layer (a ^. secondLayer))
+               then layer (a ^. firstLayer) . layer (a ^. secondLayer)
                else layer (a ^. secondLayer)
 
     layer :: Layer -> AdjacencyScore -> AdjacencyScore
