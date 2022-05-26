@@ -4,6 +4,10 @@
 
   * Added a `ToJSON` instance to the `Score` type.
 
+  * Minor releases:
+
+    - Version 0.3.1 (May 26, 2022): Update dependency bounds
+
 ## 0.2.1.0 (September 25, 2019)
 
   * Export the entire `HasConfig` class so external code can use the
