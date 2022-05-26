@@ -46,7 +46,7 @@ jobs:
         run: cabal test
 
       - name: Upload Build Logs on Failure
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: logs-${{ matrix.os }}-ghc${{ matrix.ghc }}
@@ -56,7 +56,7 @@ jobs:
         run: cabal install --installdir=artifacts --install-method=copy
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-ghc${{ matrix.ghc }}
           path: artifacts/
