@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TupleSections #-}
 
 {-|
 
@@ -120,7 +121,7 @@ graph cfg day password =
     exit = Text.length password
 
     nodes :: [Node]
-    nodes = zip [0..exit] (repeat ())
+    nodes = map (,()) [0..exit]
 
     edges' :: Map (Int, Int) Integer
     edges' =

@@ -27,7 +27,7 @@ module Zxcvbn.Adjacency
 -- Library Imports:
 import Control.Lens
 import Control.Lens.TH (makePrisms)
-import Control.Monad (forM_)
+import Control.Monad (forM_, join, when)
 import Control.Monad.State.Strict
 import Data.Char (isSpace)
 import Data.Map (Map)

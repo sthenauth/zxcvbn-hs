@@ -1,5 +1,15 @@
 # Revision History
 
+## 0.3.2 (June 22, 2023)
+
++ Bump version numbers [#14](https://github.com/sthenauth/zxcvbn-hs/pull/14)
++ Fix minor hlint error
++ Add ghc 9.6 support
+
+## 0.3.1 (May 26, 2022)
+
++ Bump version numbers
+
 ## 0.3.0.0 (October 29, 2020)
 
   * Added a `ToJSON` instance to the `Score` type.
