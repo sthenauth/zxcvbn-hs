@@ -1,6 +1,6 @@
 cabal-version:      2.2
 name:               zxcvbn-hs
-version:            0.3.1
+version:            0.3.2
 synopsis:           Password strength estimation based on zxcvbn.
 license:            MIT
 license-file:       LICENSE
@@ -64,7 +64,7 @@ common dependencies
 common tool-dependencies
   build-depends:
     , filepath              ^>=1.4
-    , mtl                   ^>=2.2
+    , mtl                   >=2.2 && <2.4.0
     , optparse-applicative  >=0.14 && <0.18
     , pipes                 ^>=4.3
     , pipes-safe            ^>=2.3
