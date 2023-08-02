@@ -1,5 +1,11 @@
 # Revision History
 
+## 0.3.3 (Aug 02 2023)
+* Bump [#17](https://github.com/sthenauth/zxcvbn-hs/pull/17)
+  aeson >=1.3 && <2.2 (latest: 2.2.0.0)
+  hedgehog >=0.6 && <1.3 (latest: 1.3)
+
+
 ## 0.3.2 (June 22, 2023)
 
 + Bump version numbers [#14](https://github.com/sthenauth/zxcvbn-hs/pull/14)
