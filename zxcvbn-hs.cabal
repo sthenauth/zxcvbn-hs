@@ -1,6 +1,6 @@
 cabal-version:      2.2
 name:               zxcvbn-hs
-version:            0.3.3
+version:            0.3.4
 synopsis:           Password strength estimation based on zxcvbn.
 license:            MIT
 license-file:       LICENSE
@@ -61,16 +61,6 @@ common dependencies
     zlib ^>=0.6
 
 --------------------------------------------------------------------------------
-common tool-dependencies
-  build-depends:
-    filepath ^>=1.4,
-    mtl >=2.2 && <2.4.0,
-    optparse-applicative >=0.14 && <0.18,
-    pipes ^>=4.3,
-    pipes-safe ^>=2.3,
-    pipes-text >=0.0 && <1.1
-
---------------------------------------------------------------------------------
 library
   import:          options, dependencies
 
@@ -101,7 +91,7 @@ library
 
 --------------------------------------------------------------------------------
 executable zxcvbn-tools
-  import:         options, dependencies, tool-dependencies
+  import:         options, dependencies
   main-is:        Main.hs
   hs-source-dirs: tools
   other-modules:
@@ -110,7 +100,14 @@ executable zxcvbn-tools
     Zxcvbn.Freq
     Zxcvbn.Global
 
-  build-depends:  zxcvbn-hs
+  build-depends:
+    zxcvbn-hs,
+    filepath ^>=1.4,
+    mtl >=2.2,
+    optparse-applicative >=0.14,
+    pipes ^>=4.3,
+    pipes-safe ^>=2.3,
+    pipes-text >=0.0
 
   if !flag(tools)
     buildable: False

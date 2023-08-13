@@ -1,5 +1,8 @@
 # Revision History
 
+## 0.3.4 2023.08.13 
++ Bump opt parse applicative [#20](https://github.com/sthenauth/zxcvbn-hs/pull/20)
+
 ## 0.3.3 (Aug 02 2023)
 * Bump [#17](https://github.com/sthenauth/zxcvbn-hs/pull/17)
   aeson >=1.3 && <2.2 (latest: 2.2.0.0)
