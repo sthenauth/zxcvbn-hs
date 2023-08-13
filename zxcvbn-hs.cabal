@@ -101,7 +101,7 @@ executable zxcvbn-tools
     Zxcvbn.Global
 
   build-depends:
-    zxcvbn-hs
+    zxcvbn-hs,
     filepath ^>=1.4,
     mtl >=2.2 && <2.4.0,
     optparse-applicative >=0.14 && <0.19,
