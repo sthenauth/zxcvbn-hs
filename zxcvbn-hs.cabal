@@ -104,7 +104,7 @@ executable zxcvbn-tools
     zxcvbn-hs
     filepath ^>=1.4,
     mtl >=2.2 && <2.4.0,
-    optparse-applicative >=0.14 && <0.18,
+    optparse-applicative >=0.14 && <0.19,
     pipes ^>=4.3,
     pipes-safe ^>=2.3,
     pipes-text >=0.0 && <1.1
