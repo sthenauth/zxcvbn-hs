@@ -25,4 +25,4 @@ jobs:
     steps:
     - uses: nomeata/haskell-bounds-bump-action@main
       with:
-        test: false
+        test: true
