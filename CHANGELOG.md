@@ -1,5 +1,8 @@
 # Revision History
 
+## 0.3.6 2023.09.11 
++ bump tasty bounds
+
 ## 0.3.4 2023.08.13 
 + Bump opt parse applicative [#20](https://github.com/sthenauth/zxcvbn-hs/pull/20)
 
