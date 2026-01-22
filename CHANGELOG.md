@@ -1,9 +1,13 @@
 # Revision History
 
-## 0.3.6 2023.09.11 
+## 0.3.7 2026.01.21
++ Compatible with zlib-0.7, bump bounds
++ Allow hedgehog 1.5
+
+## 0.3.6 2023.09.11
 + bump tasty bounds
 
-## 0.3.4 2023.08.13 
+## 0.3.4 2023.08.13
 + Bump opt parse applicative [#20](https://github.com/sthenauth/zxcvbn-hs/pull/20)
 
 ## 0.3.3 (Aug 02 2023)
