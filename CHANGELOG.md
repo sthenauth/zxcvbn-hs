@@ -1,6 +1,6 @@
 # Revision History
 
-## 0.3.7 2026.01.21
+## 0.3.8 2026.01.21
 + Compatible with zlib-0.7, bump bounds
 + Allow hedgehog 1.5
 
